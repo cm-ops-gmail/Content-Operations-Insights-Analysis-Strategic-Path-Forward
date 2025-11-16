@@ -1,9 +1,7 @@
 import DashboardHeader from '@/components/dashboard/header';
-import KpiCard from '@/components/dashboard/kpi-card';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import ComparativeAnalysis from '@/components/dashboard/comparative-analysis';
 import TeamwiseOverview from '@/components/dashboard/teamwise-overview';
-import { TrendingUp, Users, Zap, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
@@ -13,33 +11,6 @@ const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
 );
 
 export default function Home() {
-  const kpiData = [
-    {
-      title: "Total Views",
-      value: "1.2M",
-      change: "+12.5%",
-      icon: <TrendingUp className="text-accent" />,
-    },
-    {
-      title: "Audience Growth",
-      value: "4,802",
-      change: "+8.2%",
-      icon: <Users className="text-accent" />,
-    },
-    {
-      title: "Engagement Rate",
-      value: "4.8%",
-      change: "-0.2%",
-      icon: <Zap className="text-accent" />,
-    },
-    {
-      title: "Content Interactions",
-      value: "257k",
-      change: "+21.9%",
-      icon: <Activity className="text-accent" />,
-    },
-  ];
-
   const teams = [
     { name: "Study Material Design", abbreviation: "SMD", total: 1240, current: 450 },
     { name: "Content Quality Assurance", abbreviation: "QAC", total: 980, current: 320 },
@@ -83,17 +54,6 @@ export default function Home() {
 
             <TeamwiseOverview />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {kpiData.map((kpi, index) => (
-                <KpiCard
-                  key={index}
-                  title={kpi.title}
-                  value={kpi.value}
-                  change={kpi.change}
-                  icon={kpi.icon}
-                />
-              ))}
-            </div>
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
               <div className="lg:col-span-3">
                 <PerformanceChart />
