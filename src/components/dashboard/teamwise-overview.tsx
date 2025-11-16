@@ -186,13 +186,13 @@ const ComparisonSection = () => {
                 <CardTitle className="text-center">Comparison</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-6 items-center">
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap justify-center items-center gap-2 md:gap-4">
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-[240px] justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80",
+                                    "w-48 justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80",
                                     !month1 && "text-muted-foreground"
                                 )}
                             >
@@ -215,7 +215,7 @@ const ComparisonSection = () => {
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-[240px] justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80",
+                                    "w-48 justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80",
                                     !month2 && "text-muted-foreground"
                                 )}
                             >
