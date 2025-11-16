@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bar, BarChart, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, Legend } from "recharts";
 import {
   Card,
   CardContent,
@@ -18,14 +18,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Calendar } from "@/components/ui/calendar";
+import { Button } from "@/components/ui/button";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   ChartConfig,
 } from "@/components/ui/chart";
-import type { DateRange } from "react-day-picker";
 
 const teams = [
   "Study Material Design",
@@ -84,15 +83,15 @@ const materialVerticalOptions = [
 ];
 
 const comparisonChartData = [
-  { team: "SMD", month1: 1200, month2: 1500 },
-  { team: "QAC", month1: 950, month2: 1100 },
-  { team: "CM", month1: 1600, month2: 1450 },
-  { team: "Class Ops", month1: 700, month2: 850 },
+  { team: "SMD", july: 1200, august: 1500 },
+  { team: "QAC", july: 950, august: 1100 },
+  { team: "CM", july: 1600, august: 1450 },
+  { team: "Class Ops", july: 700, august: 850 },
 ];
 
 const chartConfig = {
-  month1: { label: "Selected Month 1", color: "hsl(var(--chart-1))" },
-  month2: { label: "Selected Month 2", color: "hsl(var(--chart-2))" },
+  july: { label: "July", color: "hsl(var(--chart-1))" },
+  august: { label: "August", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig;
 
 const Scoreboard = ({ title, value }: { title: string; value: string }) => (
@@ -143,57 +142,52 @@ const FilterDropdowns = () => (
   </div>
 );
 
-const ComparisonSection = ({ dateRange, setDateRange }: { dateRange: DateRange | undefined, setDateRange: (range: DateRange | undefined) => void }) => (
-  <Card className="bg-slate-900/60 border-teal-500/50 mt-4">
-    <CardHeader>
-      <CardTitle>Comparison</CardTitle>
-    </CardHeader>
-    <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-      <div className="md:col-span-2 flex justify-center">
-        <Calendar
-          mode="range"
-          selected={dateRange}
-          onSelect={setDateRange}
-          numberOfMonths={2}
-          className="rounded-md border border-teal-500/30 p-2"
-        />
-      </div>
-      <div className="md:col-span-3 h-64">
-        <ChartContainer config={chartConfig} className="w-full h-full">
-          <BarChart accessibilityLayer data={comparisonChartData}>
-            <XAxis
-              dataKey="team"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              stroke="hsl(var(--muted-foreground))"
-            />
-            <YAxis
-              stroke="hsl(var(--muted-foreground))"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              tickFormatter={(value) =>
-                typeof value === 'number' && value > 1000
-                  ? `${value / 1000}k`
-                  : `${value}`
-              }
-            />
-            <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-            <Bar dataKey="month1" fill="var(--color-month1)" radius={4} />
-            <Bar dataKey="month2" fill="var(--color-month2)" radius={4} />
-          </BarChart>
-        </ChartContainer>
-      </div>
-    </CardContent>
-  </Card>
-);
+const ComparisonSection = () => (
+    <Card className="bg-slate-900/60 border-teal-500/50 mt-4">
+      <CardHeader>
+        <CardTitle className="text-center">Comparison</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-6 items-center">
+        <div className="flex items-center gap-4">
+            <Button variant="outline" className="bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80">July</Button>
+            <span className="text-sm font-medium text-muted-foreground">VS</span>
+            <Button variant="outline" className="bg-purple-900/50 border-purple-500 hover:bg-purple-900/80">August</Button>
+        </div>
+        <div className="w-full h-64">
+          <ChartContainer config={chartConfig} className="w-full h-full">
+            <BarChart accessibilityLayer data={comparisonChartData}>
+              <XAxis
+                dataKey="team"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                stroke="hsl(var(--muted-foreground))"
+              />
+              <YAxis
+                stroke="hsl(var(--muted-foreground))"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                tickFormatter={(value) =>
+                  typeof value === 'number' && value >= 1000
+                    ? `${value / 1000}k`
+                    : `${value}`
+                }
+              />
+              <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+              <Legend />
+              <Bar dataKey="july" fill="var(--color-july)" radius={4} />
+              <Bar dataKey="august" fill="var(--color-august)" radius={4} />
+            </BarChart>
+          </ChartContainer>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
 export default function TeamwiseOverview() {
   const [selectedTeam1, setSelectedTeam1] = useState(teams[0]);
   const [selectedTeam2, setSelectedTeam2] = useState(teams[1]);
-  const [dateRange1, setDateRange1] = useState<DateRange | undefined>();
-  const [dateRange2, setDateRange2] = useState<DateRange | undefined>();
 
   return (
     <Card className="bg-card/50 border-cyan-500/50">
@@ -235,7 +229,7 @@ export default function TeamwiseOverview() {
                 {teamData[selectedTeam1].box1}
               </p>
               <Separator className="bg-cyan-500/30 my-4" />
-              <ComparisonSection dateRange={dateRange1} setDateRange={setDateRange1} />
+              <ComparisonSection />
             </CardContent>
           </Card>
           <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
@@ -268,7 +262,7 @@ export default function TeamwiseOverview() {
                 {teamData[selectedTeam2].box2}
               </p>
               <Separator className="bg-cyan-500/30 my-4" />
-              <ComparisonSection dateRange={dateRange2} setDateRange={setDateRange2} />
+              <ComparisonSection />
             </CardContent>
           </Card>
         </div>
