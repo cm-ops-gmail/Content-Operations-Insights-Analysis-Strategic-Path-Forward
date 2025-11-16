@@ -24,6 +24,7 @@ export default function Home() {
     async function fetchData() {
       try {
         setLoading(true);
+        setError(null);
         const response = await fetch('/api/sheets');
         if (!response.ok) {
           const errorData = await response.json();
