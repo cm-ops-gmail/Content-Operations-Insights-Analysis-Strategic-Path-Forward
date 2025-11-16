@@ -44,12 +44,81 @@ const teamData: Record<string, { box1: string; box2: string }> = {
   },
 };
 
+const months = ["July", "August", "September"];
+const categories = [
+  "Academics [Junior Segment]",
+  "Academics [Senior Segment]",
+  "Book Project",
+  "Skills & English",
+];
+const listingOptions = [
+  "Course Listing",
+  "PDP Update",
+  "IELTS Mock Test Listing",
+  "Homework Listing / Assign",
+  "Lecture Slide",
+  "Lecture Sheet",
+  "Daily Quiz",
+  "Weekly Quiz",
+  "Weekly CQ",
+  "Monthly Quiz",
+  "Monthly CQ",
+  "Model Test Quiz",
+  "Model Test CQ",
+  "LIVE Class Listing / Upload",
+  "Record Shoot Listing / Upload",
+  "Monthly Quiz Written",
+  "Workbook",
+  "Math Exercise Solve",
+  "Book",
+  "Practice Sheet",
+];
+
 const Scoreboard = ({ title, value }: { title: string; value: string }) => (
     <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30">
         <p className="text-sm text-muted-foreground">{title}</p>
         <p className="text-2xl font-bold text-foreground">{value}</p>
     </div>
 );
+
+const FilterDropdowns = () => (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <Select>
+            <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+                <SelectValue placeholder="Month" />
+            </SelectTrigger>
+            <SelectContent className="border-cyan-500/80">
+                {months.map(month => <SelectItem key={month} value={month}>{month}</SelectItem>)}
+            </SelectContent>
+        </Select>
+        <Select>
+            <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+                <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent className="border-cyan-500/80">
+                {categories.map(category => <SelectItem key={category} value={category}>{category}</SelectItem>)}
+            </SelectContent>
+        </Select>
+        <Select>
+            <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+                <SelectValue placeholder="Listing" />
+            </SelectTrigger>
+            <SelectContent className="border-cyan-500/80 max-h-60">
+                {listingOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
+            </SelectContent>
+        </Select>
+        <Select>
+            <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+                <SelectValue placeholder="Filter 4" />
+            </SelectTrigger>
+            <SelectContent className="border-cyan-500/80">
+                <SelectItem value="option1">Option 1</SelectItem>
+                <SelectItem value="option2">Option 2</SelectItem>
+            </SelectContent>
+        </Select>
+    </div>
+)
+
 
 export default function TeamwiseOverview() {
   const [selectedTeam1, setSelectedTeam1] = useState(teams[0]);
@@ -84,19 +153,7 @@ export default function TeamwiseOverview() {
               </div>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Select key={i}>
-                    <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-                      <SelectValue placeholder={`Filter ${i + 1}`} />
-                    </SelectTrigger>
-                    <SelectContent className="border-cyan-500/80">
-                      <SelectItem value="option1">Option 1</SelectItem>
-                      <SelectItem value="option2">Option 2</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ))}
-              </div>
+              <FilterDropdowns />
               <Separator className="bg-cyan-500/30 my-2" />
                <div className="grid grid-cols-2 gap-4">
                   <Scoreboard title="Budget" value="$15,230" />
@@ -126,19 +183,7 @@ export default function TeamwiseOverview() {
               </div>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                   <Select key={i}>
-                    <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-                      <SelectValue placeholder={`Filter ${i + 1}`} />
-                    </SelectTrigger>
-                    <SelectContent className="border-cyan-500/80">
-                      <SelectItem value="option1">Option 1</SelectItem>
-                      <SelectItem value="option2">Option 2</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ))}
-              </div>
+              <FilterDropdowns />
                <Separator className="bg-cyan-500/30 my-2" />
                <div className="grid grid-cols-2 gap-4">
                    <Scoreboard title="Budget" value="$22,500" />
