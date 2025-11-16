@@ -1,6 +1,5 @@
 import DashboardHeader from '@/components/dashboard/header';
 import PerformanceChart from '@/components/dashboard/performance-chart';
-import ComparativeAnalysis from '@/components/dashboard/comparative-analysis';
 import TeamwiseOverview from '@/components/dashboard/teamwise-overview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -54,14 +53,8 @@ export default function Home() {
 
             <TeamwiseOverview />
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-              <div className="lg:col-span-3">
-                <PerformanceChart />
-              </div>
-              <div className="lg:col-span-2">
-                <ComparativeAnalysis />
-              </div>
-            </div>
+            <PerformanceChart />
+
           </div>
         </div>
       </main>
