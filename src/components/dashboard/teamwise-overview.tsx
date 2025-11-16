@@ -45,13 +45,13 @@ const teamData: Record<string, { box1: string; box2: string }> = {
 };
 
 const months = ["July", "August", "September"];
-const categories = [
+const teamAndProductOptions = [
   "Academics [Junior Segment]",
   "Academics [Senior Segment]",
   "Book Project",
   "Skills & English",
 ];
-const listingOptions = [
+const materialVerticalOptions = [
   "Course Listing",
   "PDP Update",
   "IELTS Mock Test Listing",
@@ -82,7 +82,7 @@ const Scoreboard = ({ title, value }: { title: string; value: string }) => (
 );
 
 const FilterDropdowns = () => (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         <Select>
             <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
                 <SelectValue placeholder="Month" />
@@ -93,27 +93,18 @@ const FilterDropdowns = () => (
         </Select>
         <Select>
             <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="Team [Product]" />
             </SelectTrigger>
             <SelectContent className="border-cyan-500/80">
-                {categories.map(category => <SelectItem key={category} value={category}>{category}</SelectItem>)}
+                {teamAndProductOptions.map(category => <SelectItem key={category} value={category}>{category}</SelectItem>)}
             </SelectContent>
         </Select>
         <Select>
             <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-                <SelectValue placeholder="Listing" />
+                <SelectValue placeholder="Material Vertical" />
             </SelectTrigger>
             <SelectContent className="border-cyan-500/80 max-h-60">
-                {listingOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
-            </SelectContent>
-        </Select>
-        <Select>
-            <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-                <SelectValue placeholder="Filter 4" />
-            </SelectTrigger>
-            <SelectContent className="border-cyan-500/80">
-                <SelectItem value="option1">Option 1</SelectItem>
-                <SelectItem value="option2">Option 2</SelectItem>
+                {materialVerticalOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
             </SelectContent>
         </Select>
     </div>
@@ -155,7 +146,8 @@ export default function TeamwiseOverview() {
             <CardContent className="flex-1 flex flex-col gap-4">
               <FilterDropdowns />
               <Separator className="bg-cyan-500/30 my-2" />
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-3 gap-4">
+                  <Scoreboard title="File Count" value="1,280" />
                   <Scoreboard title="Budget" value="$15,230" />
                   <Scoreboard title="Payment" value="$12,890" />
               </div>
@@ -185,7 +177,8 @@ export default function TeamwiseOverview() {
             <CardContent className="flex-1 flex flex-col gap-4">
               <FilterDropdowns />
                <Separator className="bg-cyan-500/30 my-2" />
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-3 gap-4">
+                   <Scoreboard title="File Count" value="950" />
                    <Scoreboard title="Budget" value="$22,500" />
                    <Scoreboard title="Payment" value="$19,750" />
               </div>
