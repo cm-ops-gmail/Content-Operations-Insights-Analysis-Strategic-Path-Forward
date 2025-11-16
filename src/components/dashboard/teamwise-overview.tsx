@@ -195,7 +195,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
     const teamAndProductOptions = useMemo(() => {
         if (!detailsData || detailsData.length <= 1) return [];
         const header = detailsData[0];
-        const columnIndex = header.indexOf('Team [Product]');
+        const columnIndex = header.findIndex((h: string) => h?.trim().toLowerCase() === 'team [product]');
         if (columnIndex === -1) return [];
         return [...new Set(detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean))];
     }, [detailsData]);
@@ -203,7 +203,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
     const materialVerticalOptions = useMemo(() => {
         if (!detailsData || detailsData.length <= 1) return [];
         const header = detailsData[0];
-        const columnIndex = header.indexOf('Material Vertical');
+        const columnIndex = header.findIndex((h: string) => h?.trim().toLowerCase() === 'material vertical');
         if (columnIndex === -1) return [];
         return [...new Set(detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean))];
     }, [detailsData]);
@@ -212,22 +212,29 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
     const currentTeamData = sheetData[currentTeamSheetName] || [];
 
     const { fileCount, budget, payment, highlights, lowlights, insights } = useMemo(() => {
-        if (currentTeamData.length < 2) { // Ensure there's at least a header and one data row
+        if (currentTeamData.length < 2) { 
             return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '' };
         }
+    
+        const headerRow = currentTeamData[0];
+        const dataRows = currentTeamData.slice(1);
+    
+        const getIndex = (name: string) => headerRow.findIndex(col => col && col.toString().trim().toLowerCase() === name.toLowerCase());
+    
+        const fileCountIndex = getIndex('File Count');
+        const budgetIndex = getIndex('Budget');
+        const paymentIndex = getIndex('Payment [Paid]');
+        const highlightsIndex = getIndex('Highlights');
+        const lowlightsIndex = getIndex('Lowlights');
+        const insightsIndex = getIndex('Strategic Path Forward');
 
-        const dataRows = currentTeamData.slice(1); // Skip header row
-
-        const fileCountValue = dataRows.reduce((sum, row) => sum + (parseInt(row[4], 10) || 0), 0);
-        const budgetValue = dataRows.reduce((sum, row) => sum + (parseFloat(String(row[5]).replace(/[^0-9.-]+/g,"")) || 0), 0);
-        const paymentValue = dataRows.reduce((sum, row) => sum + (parseFloat(String(row[6]).replace(/[^0-9.-]+/g,"")) || 0), 0);
+        const fileCountValue = dataRows.reduce((sum, row) => sum + (parseInt(row[fileCountIndex], 10) || 0), 0);
+        const budgetValue = dataRows.reduce((sum, row) => sum + (parseFloat(String(row[budgetIndex]).replace(/[^0-9.-]+/g,"")) || 0), 0);
+        const paymentValue = dataRows.reduce((sum, row) => sum + (parseFloat(String(row[paymentIndex]).replace(/[^0-9.-]+/g,"")) || 0), 0);
         
-        // Assuming Highlights, Lowlights, Insights are not aggregated per row but are in specific cells
-        // This part might need adjustment if these are per-row values.
-        // For now, let's assume they are not present in the new structure or need a different logic.
-        const highlightsText = ''; // Placeholder
-        const lowlightsText = ''; // Placeholder
-        const insightsText = ''; // Placeholder
+        const highlightsText = highlightsIndex !== -1 ? dataRows.map(row => row[highlightsIndex]).filter(Boolean).join('\n') : '';
+        const lowlightsText = lowlightsIndex !== -1 ? dataRows.map(row => row[lowlightsIndex]).filter(Boolean).join('\n') : '';
+        const insightsText = insightsIndex !== -1 ? dataRows.map(row => row[insightsIndex]).filter(Boolean).join('\n') : '';
 
         return {
             fileCount: fileCountValue.toLocaleString(),
