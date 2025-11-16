@@ -2,8 +2,14 @@ import DashboardHeader from '@/components/dashboard/header';
 import KpiCard from '@/components/dashboard/kpi-card';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import ComparativeAnalysis from '@/components/dashboard/comparative-analysis';
-import { TrendingUp, Users, Zap, Activity, RectangleHorizontal } from 'lucide-react';
+import { TrendingUp, Users, Zap, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
+  <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-accent/20 border border-accent/50">
+    <span className="text-sm font-bold text-accent">{abbreviation}</span>
+  </div>
+);
 
 export default function Home() {
   const kpiData = [
@@ -34,10 +40,10 @@ export default function Home() {
   ];
 
   const teams = [
-    { name: "Study Material Design", icon: <RectangleHorizontal className="h-6 w-6 text-accent" /> },
-    { name: "Content Quality Assurance", icon: <RectangleHorizontal className="h-6 w-6 text-accent" /> },
-    { name: "Content Management", icon: <RectangleHorizontal className="h-6 w-6 text-accent" /> },
-    { name: "Class Operations", icon: <RectangleHorizontal className="h-6 w-6 text-accent" /> },
+    { name: "Study Material Design", abbreviation: "SMD" },
+    { name: "Content Quality Assurance", abbreviation: "QAC" },
+    { name: "Content Management", abbreviation: "CM" },
+    { name: "Class Operations", abbreviation: "CO" },
   ];
 
   return (
@@ -54,9 +60,9 @@ export default function Home() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {teams.map((team) => (
                     <Card key={team.name} className="border-accent/50 hover:border-accent transition-colors">
-                      <CardContent className="flex items-center justify-center p-6 gap-4">
-                        {team.icon}
-                        <h3 className="text-base font-bold text-center">{team.name}</h3>
+                      <CardContent className="flex items-center p-4 gap-4">
+                        <TeamIcon abbreviation={team.abbreviation} />
+                        <h3 className="text-base font-bold flex-1">{team.name}</h3>
                       </CardContent>
                     </Card>
                   ))}
