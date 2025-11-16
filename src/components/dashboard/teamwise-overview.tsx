@@ -278,90 +278,63 @@ const ComparisonSection = () => {
     )
 };
 
-export default function TeamwiseOverview() {
-  const [selectedTeam1, setSelectedTeam1] = useState(teams[0]);
-  const [selectedTeam2, setSelectedTeam2] = useState(teams[1]);
-
-  return (
-    <Card className="bg-card/50 border-cyan-500/50">
-      <CardHeader>
-        <CardTitle>Teamwise Overview</CardTitle>
-        <CardDescription>
-          Select a team in each section to view specific details.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-lg">Section 1</CardTitle>
-              <div className="pt-2">
-                <Select value={selectedTeam1} onValueChange={setSelectedTeam1}>
-                  <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500">
-                    <SelectValue placeholder="Select a team" />
-                  </SelectTrigger>
-                  <SelectContent className="border-cyan-500/80">
-                    {teams.map((team) => (
-                      <SelectItem key={team} value={team}>
-                        {team}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col gap-4">
-              <FilterDropdowns />
-              <Separator className="bg-cyan-500/30 my-2" />
-              <div className="grid grid-cols-3 gap-4">
+const Section = ({ title, selectedTeam }: { title: string; selectedTeam: string }) => (
+    <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
+        <CardHeader>
+            <CardTitle className="text-lg">{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col gap-4">
+            <FilterDropdowns />
+            <Separator className="bg-cyan-500/30 my-2" />
+            <div className="grid grid-cols-3 gap-4">
                 <Scoreboard title="File Count" value="1,280" />
                 <Scoreboard title="Budget" value="$15,230" />
                 <Scoreboard title="Payment" value="$12,890" />
-              </div>
-              <p className="text-muted-foreground mt-4">
-                {teamData[selectedTeam1].box1}
-              </p>
-              <Separator className="bg-cyan-500/30 my-4" />
-              <ComparisonSection />
-            </CardContent>
-          </Card>
-          <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-lg">Section 2</CardTitle>
-              <div className="pt-2">
-                <Select value={selectedTeam2} onValueChange={setSelectedTeam2}>
-                  <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500">
-                    <SelectValue placeholder="Select a team" />
-                  </SelectTrigger>
-                  <SelectContent className="border-cyan-500/80">
-                    {teams.map((team) => (
-                      <SelectItem key={team} value={team}>
-                        {team}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col gap-4">
-              <FilterDropdowns />
-              <Separator className="bg-cyan-500/30 my-2" />
-              <div className="grid grid-cols-3 gap-4">
-                <Scoreboard title="File Count" value="950" />
-                <Scoreboard title="Budget" value="$22,500" />
-                <Scoreboard title="Payment" value="$19,750" />
-              </div>
-              <p className="text-muted-foreground mt-4">
-                {teamData[selectedTeam2].box2}
-              </p>
-              <Separator className="bg-cyan-500/30 my-4" />
-              <ComparisonSection />
-            </CardContent>
-          </Card>
-        </div>
-      </CardContent>
+            </div>
+            <p className="text-muted-foreground mt-4">
+              {/* @ts-ignore */}
+                {teamData[selectedTeam][title === 'Section 1' ? 'box1' : 'box2']}
+            </p>
+            <Separator className="bg-cyan-500/30 my-4" />
+            <ComparisonSection />
+        </CardContent>
     </Card>
-  );
-}
+);
 
-    
+
+export default function TeamwiseOverview() {
+    const [selectedTeam, setSelectedTeam] = useState(teams[0]);
+
+    return (
+        <Card className="bg-card/50 border-cyan-500/50">
+            <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <CardTitle>Teamwise Overview</CardTitle>
+                    <CardDescription>
+                        Select a team to view specific details across sections.
+                    </CardDescription>
+                </div>
+                <div className="w-full md:w-64">
+                    <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+                        <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500">
+                            <SelectValue placeholder="Select a team" />
+                        </SelectTrigger>
+                        <SelectContent className="border-cyan-500/80">
+                            {teams.map((team) => (
+                                <SelectItem key={team} value={team}>
+                                    {team}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Section title="Section 1" selectedTeam={selectedTeam} />
+                    <Section title="Section 2" selectedTeam={selectedTeam} />
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
