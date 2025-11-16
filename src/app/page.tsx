@@ -28,9 +28,6 @@ export default function Home() {
         const response = await fetch('/api/sheets');
         if (!response.ok) {
           const errorData = await response.json();
-          if (response.status === 403) {
-             throw new Error("Permission Denied: Please make sure the service account 'service@n8n-ocr-workflow-connection.iam.gserviceaccount.com' has 'Editor' permissions on your Google Sheet and that the Google Sheets API is enabled in your Google Cloud project.");
-          }
           throw new Error(errorData.error || 'Failed to fetch data');
         }
         const result = await response.json();
@@ -41,10 +38,7 @@ export default function Home() {
         setLoading(false);
       }
     }
-    // We are disabling fetching for now to prevent app crash.
-    // To re-enable, uncomment the line below.
-    // fetchData();
-    setLoading(false);
+    fetchData();
   }, []);
   
   const teams = [
