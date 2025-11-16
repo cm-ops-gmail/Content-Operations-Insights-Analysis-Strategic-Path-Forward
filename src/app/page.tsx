@@ -40,10 +40,10 @@ export default function Home() {
   ];
 
   const teams = [
-    { name: "Study Material Design", abbreviation: "SMD" },
-    { name: "Content Quality Assurance", abbreviation: "QAC" },
-    { name: "Content Management", abbreviation: "CM" },
-    { name: "Class Operations", abbreviation: "CO" },
+    { name: "Study Material Design", abbreviation: "SMD", total: 1240, current: 450 },
+    { name: "Content Quality Assurance", abbreviation: "QAC", total: 980, current: 320 },
+    { name: "Content Management", abbreviation: "CM", total: 1530, current: 510 },
+    { name: "Class Operations", abbreviation: "CO", total: 720, current: 240 },
   ];
 
   return (
@@ -57,12 +57,22 @@ export default function Home() {
                 <CardTitle>Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {teams.map((team) => (
-                    <Card key={team.name} className="border-accent/50 hover:border-accent transition-colors">
-                      <CardContent className="flex items-center p-4 gap-4">
+                    <Card key={team.name} className="border-accent/50 hover:border-accent transition-colors flex flex-col">
+                      <CardHeader className="flex flex-row items-center gap-4 pb-2">
                         <TeamIcon abbreviation={team.abbreviation} />
                         <h3 className="text-base font-bold flex-1">{team.name}</h3>
+                      </CardHeader>
+                      <CardContent className="flex-1 flex justify-between items-center p-4 pt-2">
+                        <div className="text-left">
+                          <p className="text-xs text-muted-foreground">Total Contents (Last 3 Months)</p>
+                          <p className="text-2xl font-bold text-foreground">{team.total.toLocaleString()}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground">Current Month Content Count</p>
+                          <p className="text-2xl font-bold text-foreground">{team.current.toLocaleString()}</p>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
