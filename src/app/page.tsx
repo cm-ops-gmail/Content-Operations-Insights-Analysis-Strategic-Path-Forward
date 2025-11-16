@@ -41,10 +41,10 @@ export default function Home() {
   }, []);
   
   const teams = [
-    { name: "Study Material Design", abbreviation: "SMD", total: 1240, current: 450 },
-    { name: "Content Quality Assurance", abbreviation: "QAC", total: 980, current: 320 },
-    { name: "Content Management", abbreviation: "CM", total: 1530, current: 510 },
-    { name: "Class Operations", abbreviation: "CO", total: 720, current: 240 },
+    { name: "Study Material Design", abbreviation: "SMD", total: 0, current: 0 },
+    { name: "Content Quality Assurance", abbreviation: "QAC", total: 0, current: 0 },
+    { name: "Content Management", abbreviation: "CM", total: 0, current: 0 },
+    { name: "Class Operations", abbreviation: "CO", total: 0, current: 0 },
   ];
   
   const smdData = data['SMD Analysis [Monthwise]'] || [];
@@ -90,8 +90,8 @@ export default function Home() {
 
   const updatedTeams = teams.map(team => ({
       ...team,
-      total: teamTotals[team.abbreviation as keyof typeof teamTotals] || team.total,
-      current: teamCurrentTotals[team.abbreviation as keyof typeof teamCurrentTotals] || team.current,
+      total: teamTotals[team.abbreviation as keyof typeof teamTotals] || 0,
+      current: teamCurrentTotals[team.abbreviation as keyof typeof teamCurrentTotals] || 0,
   }));
   
   const chartData = updatedTeams.map(t => ({ team: t.abbreviation, fileCount: t.total }));
