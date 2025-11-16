@@ -2,7 +2,10 @@
 "use client";
 
 import { useState } from "react";
-import { Bar, BarChart, XAxis, YAxis, Legend } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, Legend, LabelList } from "recharts";
+import { Calendar as CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+
 import {
   Card,
   CardContent,
@@ -25,6 +28,9 @@ import {
   ChartTooltipContent,
   ChartConfig,
 } from "@/components/ui/chart";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 const teams = [
   "Study Material Design",
@@ -82,16 +88,32 @@ const materialVerticalOptions = [
   "Practice Sheet",
 ];
 
-const comparisonChartData = [
-  { team: "SMD", july: 1200, august: 1500 },
-  { team: "QAC", july: 950, august: 1100 },
-  { team: "CM", july: 1600, august: 1450 },
-  { team: "Class Ops", july: 700, august: 850 },
-];
+const teamComparisonData: Record<string, { name: string; fileCount: number }[]> = {
+    "SMD": [
+        { name: "July", fileCount: 1200 },
+        { name: "August", fileCount: 1500 },
+        { name: "September", fileCount: 1300 },
+    ],
+    "QAC": [
+        { name: "July", fileCount: 950 },
+        { name: "August", fileCount: 1100 },
+        { name: "September", fileCount: 1000 },
+    ],
+    "CM": [
+        { name: "July", fileCount: 1600 },
+        { name: "August", fileCount: 1450 },
+        { name: "September", fileCount: 1550 },
+    ],
+    "Class Ops": [
+        { name: "July", fileCount: 700 },
+        { name: "August", fileCount: 850 },
+        { name: "September", fileCount: 750 },
+    ]
+};
 
 const chartConfig = {
-  july: { label: "July", color: "hsl(var(--chart-1))" },
-  august: { label: "August", color: "hsl(var(--chart-2))" },
+  month1: { label: "Month 1", color: "hsl(var(--chart-1))" },
+  month2: { label: "Month 2", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig;
 
 const Scoreboard = ({ title, value }: { title: string; value: string }) => (
@@ -142,48 +164,119 @@ const FilterDropdowns = () => (
   </div>
 );
 
-const ComparisonSection = () => (
-    <Card className="bg-slate-900/60 border-teal-500/50 mt-4">
-      <CardHeader>
-        <CardTitle className="text-center">Comparison</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6 items-center">
-        <div className="flex items-center gap-4">
-            <Button variant="outline" className="bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80">July</Button>
-            <span className="text-sm font-medium text-muted-foreground">VS</span>
-            <Button variant="outline" className="bg-purple-900/50 border-purple-500 hover:bg-purple-900/80">August</Button>
-        </div>
-        <div className="w-full h-64">
-          <ChartContainer config={chartConfig} className="w-full h-full">
-            <BarChart accessibilityLayer data={comparisonChartData}>
-              <XAxis
-                dataKey="team"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                stroke="hsl(var(--muted-foreground))"
-              />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={10}
-                tickFormatter={(value) =>
-                  typeof value === 'number' && value >= 1000
-                    ? `${value / 1000}k`
-                    : `${value}`
-                }
-              />
-              <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-              <Legend />
-              <Bar dataKey="july" fill="var(--color-july)" radius={4} />
-              <Bar dataKey="august" fill="var(--color-august)" radius={4} />
-            </BarChart>
-          </ChartContainer>
-        </div>
-      </CardContent>
-    </Card>
-  );
+const ComparisonSection = () => {
+    const [month1, setMonth1] = useState<Date | undefined>(new Date(2024, 6, 1));
+    const [month2, setMonth2] = useState<Date | undefined>(new Date(2024, 7, 1));
+
+    const comparisonData = [
+        { team: "SMD", month1: 1200, month2: 1500 },
+        { team: "QAC", month1: 950, month2: 1100 },
+        { team: "CM", month1: 1600, month2: 1450 },
+        { team: "Class Ops", month1: 700, month2: 850 },
+    ];
+    
+    const chartData = [
+        { month: format(month1 || new Date(), 'LLL'), fileCount: 1200, fill: "var(--color-month1)" },
+        { month: format(month2 || new Date(), 'LLL'), fileCount: 1500, fill: "var(--color-month2)" },
+    ]
+
+    return (
+        <Card className="bg-slate-900/60 border-teal-500/50 mt-4">
+            <CardHeader>
+                <CardTitle className="text-center">Comparison</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6 items-center">
+                <div className="flex items-center gap-4">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-[240px] justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80",
+                                    !month1 && "text-muted-foreground"
+                                )}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {month1 ? format(month1, "LLL yyyy") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={month1}
+                                onSelect={setMonth1}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                    <span className="text-sm font-medium text-muted-foreground">VS</span>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-[240px] justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80",
+                                    !month2 && "text-muted-foreground"
+                                )}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {month2 ? format(month2, "LLL yyyy") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={month2}
+                                onSelect={setMonth2}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+                <div className="w-full h-80">
+                  <ChartContainer config={chartConfig} className="w-full h-full">
+                      <BarChart 
+                          accessibilityLayer 
+                          data={chartData}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      >
+                          <XAxis
+                              dataKey="month"
+                              tickLine={false}
+                              tickMargin={10}
+                              axisLine={false}
+                              stroke="hsl(var(--muted-foreground))"
+                          />
+                          <YAxis
+                              stroke="hsl(var(--muted-foreground))"
+                              tickLine={false}
+                              axisLine={false}
+                              tickMargin={10}
+                              tickFormatter={(value) =>
+                                  typeof value === 'number' && value >= 1000
+                                      ? `${value / 1000}k`
+                                      : `${value}`
+                              }
+                          />
+                          <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+                          <Legend content={() => (
+                              <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+                                  <span>SMD</span>
+                                  <span>QAC</span>
+                                  <span>CM</span>
+                                  <span>Class Ops</span>
+                              </div>
+                          )} />
+                          <Bar dataKey="fileCount" radius={4}>
+                            <LabelList dataKey="fileCount" position="top" offset={10} className="fill-foreground font-semibold" />
+                          </Bar>
+                      </BarChart>
+                  </ChartContainer>
+                </div>
+            </CardContent>
+        </Card>
+    )
+};
 
 export default function TeamwiseOverview() {
   const [selectedTeam1, setSelectedTeam1] = useState(teams[0]);
@@ -270,3 +363,5 @@ export default function TeamwiseOverview() {
     </Card>
   );
 }
+
+    
