@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
 const teams = [
   "Study Material Design",
@@ -42,6 +43,13 @@ const teamData: Record<string, { box1: string; box2: string }> = {
     box2: "Details for Class Operations - Section 2",
   },
 };
+
+const Scoreboard = ({ title, value }: { title: string; value: string }) => (
+    <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30">
+        <p className="text-sm text-muted-foreground">{title}</p>
+        <p className="text-2xl font-bold text-foreground">{value}</p>
+    </div>
+);
 
 export default function TeamwiseOverview() {
   const [selectedTeam1, setSelectedTeam1] = useState(teams[0]);
@@ -75,8 +83,26 @@ export default function TeamwiseOverview() {
                 </Select>
               </div>
             </CardHeader>
-            <CardContent className="flex-1">
-              <p className="text-muted-foreground">
+            <CardContent className="flex-1 flex flex-col gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Select key={i}>
+                    <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+                      <SelectValue placeholder={`Filter ${i + 1}`} />
+                    </SelectTrigger>
+                    <SelectContent className="border-cyan-500/80">
+                      <SelectItem value="option1">Option 1</SelectItem>
+                      <SelectItem value="option2">Option 2</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ))}
+              </div>
+              <Separator className="bg-cyan-500/30 my-2" />
+               <div className="grid grid-cols-2 gap-4">
+                  <Scoreboard title="Budget" value="$15,230" />
+                  <Scoreboard title="Payment" value="$12,890" />
+              </div>
+               <p className="text-muted-foreground mt-4">
                 {teamData[selectedTeam1].box1}
               </p>
             </CardContent>
@@ -99,8 +125,26 @@ export default function TeamwiseOverview() {
                 </Select>
               </div>
             </CardHeader>
-            <CardContent className="flex-1">
-              <p className="text-muted-foreground">
+            <CardContent className="flex-1 flex flex-col gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                   <Select key={i}>
+                    <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+                      <SelectValue placeholder={`Filter ${i + 1}`} />
+                    </SelectTrigger>
+                    <SelectContent className="border-cyan-500/80">
+                      <SelectItem value="option1">Option 1</SelectItem>
+                      <SelectItem value="option2">Option 2</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ))}
+              </div>
+               <Separator className="bg-cyan-500/30 my-2" />
+               <div className="grid grid-cols-2 gap-4">
+                   <Scoreboard title="Budget" value="$22,500" />
+                   <Scoreboard title="Payment" value="$19,750" />
+              </div>
+              <p className="text-muted-foreground mt-4">
                 {teamData[selectedTeam2].box2}
               </p>
             </CardContent>
