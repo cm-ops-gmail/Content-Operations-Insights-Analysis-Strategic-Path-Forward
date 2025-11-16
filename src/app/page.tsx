@@ -2,7 +2,7 @@ import DashboardHeader from '@/components/dashboard/header';
 import KpiCard from '@/components/dashboard/kpi-card';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import ComparativeAnalysis from '@/components/dashboard/comparative-analysis';
-import { TrendingUp, Users, Zap, Activity } from 'lucide-react';
+import { TrendingUp, Users, Zap, Activity, RectangleHorizontal } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
@@ -33,7 +33,12 @@ export default function Home() {
     },
   ];
 
-  const teams = ["SMD", "QAC", "CM", "Class Ops"];
+  const teams = [
+    { name: "Study Material Design", icon: <RectangleHorizontal className="h-6 w-6 text-accent" /> },
+    { name: "Content Quality Assurance", icon: <RectangleHorizontal className="h-6 w-6 text-accent" /> },
+    { name: "Content Management", icon: <RectangleHorizontal className="h-6 w-6 text-accent" /> },
+    { name: "Class Operations", icon: <RectangleHorizontal className="h-6 w-6 text-accent" /> },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -41,17 +46,18 @@ export default function Home() {
       <main className="flex-1 p-4 md:p-6 lg:p-8">
         <div className="container mx-auto">
           <div className="grid gap-6">
-            <Card>
+            <Card className="bg-card/50">
               <CardHeader>
                 <CardTitle>Overview</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {teams.map((team) => (
-                    <Card key={team}>
-                      <CardHeader className="items-center justify-center p-4">
-                        <CardTitle className="text-base font-bold">{team}</CardTitle>
-                      </CardHeader>
+                    <Card key={team.name} className="border-accent/50 hover:border-accent transition-colors">
+                      <CardContent className="flex items-center justify-center p-6 gap-4">
+                        {team.icon}
+                        <h3 className="text-base font-bold text-center">{team.name}</h3>
+                      </CardContent>
                     </Card>
                   ))}
                 </div>
