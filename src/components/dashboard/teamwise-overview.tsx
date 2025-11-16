@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Bar, BarChart, XAxis, YAxis, LabelList } from "recharts";
-import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon, Wand2 } from "lucide-react"
 import { format } from "date-fns"
 
 import {
@@ -39,30 +39,34 @@ const teams = [
   "Class Operations",
 ];
 
-const teamData: Record<string, { box1: string; box2: string, highlights: string[], lowlights: string[] }> = {
+const teamData: Record<string, { box1: string; box2: string, highlights: string[], lowlights: string[], insights: string }> = {
   "Study Material Design": {
     box1: "Details for Study Material Design - Section 1",
     box2: "Details for Study Material Design - Section 2",
     highlights: ["Increased file count by 20% in August.", "Budget surplus of $2,000 this quarter."],
     lowlights: ["Payment processing delayed for 5 projects.", "Missed content deadline for 'Book Project'."],
+    insights: "Focus on automating payment reminders for pending projects to improve cash flow. Explore cloud storage solutions to manage budget overruns from file storage. Consider a sprint planning session for the 'Book Project' to realign on deadlines and deliverables."
   },
   "Content Quality Assurance": {
     box1: "Details for Content Quality Assurance - Section 1",
     box2: "Details for Content Quality Assurance - Section 2",
     highlights: ["Reduced error rate by 15%.", "Achieved 99% SLA for all quality checks."],
     lowlights: ["Understaffed for the 'Academics [Senior Segment]' project.", "Higher than average bugs in 'Weekly Quiz'."],
+    insights: "Leverage the success in error rate reduction by documenting best practices and sharing with other teams. Address understaffing by cross-training members from other teams or prioritizing QA tasks for the 'Academics [Senior Segment]' project. A deep-dive into the 'Weekly Quiz' bug reports could reveal a root cause."
   },
   "Content Management": {
     box1: "Details for Content Management - Section 1",
     box2: "Details for Content Management - Section 2",
     highlights: ["Streamlined the 'LIVE Class Listing / Upload' process.", "100% on-time content delivery for 'Skills & English'."],
     lowlights: ["Storage costs exceeded budget by 10%.", "Difficulty managing 'Practice Sheet' versions."],
+    insights: "The streamlined 'LIVE Class' process is a major win; apply similar principles to 'Practice Sheet' versioning. For storage costs, analyze file types and sizes to identify optimization opportunities like compression or archiving older content. Negotiating with the storage provider could also yield savings."
   },
   "Class Operations": {
     box1: "Details for Class Operations - Section 1",
     box2: "Details for Class Operations - Section 2",
     highlights: ["Improved student satisfaction by 12%.", "Successfully onboarded 5 new instructors."],
     lowlights: ["Technical issues during 3 'LIVE Class' sessions.", "Low attendance for 'IELTS Mock Test Listing'."],
+    insights: "The increase in student satisfaction is directly tied to the new instructors; ensure they receive ongoing support. Conduct a root cause analysis of the technical issues in 'LIVE Class' sessions to prevent recurrence. For 'IELTS Mock Test', survey students to understand the low attendance and adjust marketing or scheduling accordingly."
   },
 };
 
@@ -299,6 +303,20 @@ const Section = ({ title }: { title: string; }) => {
                             </ul>
                         </CardContent>
                     </Card>
+                    <Card className="bg-slate-900/60 border-purple-500/50">
+                        <CardHeader>
+                           <CardTitle className="flex items-center gap-2 text-base font-bold text-purple-400">
+                             <Wand2 className="h-5 w-5" />
+                             Strategic Insights
+                           </CardTitle>
+                           <CardDescription className="text-xs text-purple-400/80 pt-1">
+                            Key strategic initiatives and recommendations by team, for the selected month.
+                           </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">{teamData[selectedTeam].insights}</p>
+                        </CardContent>
+                    </Card>
                 </div>
             </CardContent>
         </Card>
@@ -325,3 +343,5 @@ export default function TeamwiseOverview() {
         </Card>
     );
 }
+
+    
