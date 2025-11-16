@@ -39,22 +39,30 @@ const teams = [
   "Class Operations",
 ];
 
-const teamData: Record<string, { box1: string; box2: string }> = {
+const teamData: Record<string, { box1: string; box2: string, highlights: string[], lowlights: string[] }> = {
   "Study Material Design": {
     box1: "Details for Study Material Design - Section 1",
     box2: "Details for Study Material Design - Section 2",
+    highlights: ["Increased file count by 20% in August.", "Budget surplus of $2,000 this quarter."],
+    lowlights: ["Payment processing delayed for 5 projects.", "Missed content deadline for 'Book Project'."],
   },
   "Content Quality Assurance": {
     box1: "Details for Content Quality Assurance - Section 1",
     box2: "Details for Content Quality Assurance - Section 2",
+    highlights: ["Reduced error rate by 15%.", "Achieved 99% SLA for all quality checks."],
+    lowlights: ["Understaffed for the 'Academics [Senior Segment]' project.", "Higher than average bugs in 'Weekly Quiz'."],
   },
   "Content Management": {
     box1: "Details for Content Management - Section 1",
     box2: "Details for Content Management - Section 2",
+    highlights: ["Streamlined the 'LIVE Class Listing / Upload' process.", "100% on-time content delivery for 'Skills & English'."],
+    lowlights: ["Storage costs exceeded budget by 10%.", "Difficulty managing 'Practice Sheet' versions."],
   },
   "Class Operations": {
     box1: "Details for Class Operations - Section 1",
     box2: "Details for Class Operations - Section 2",
+    highlights: ["Improved student satisfaction by 12%.", "Successfully onboarded 5 new instructors."],
+    lowlights: ["Technical issues during 3 'LIVE Class' sessions.", "Low attendance for 'IELTS Mock Test Listing'."],
   },
 };
 
@@ -210,13 +218,6 @@ const ComparisonSection = () => {
                           data={chartData}
                           margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                       >
-                          <XAxis
-                              dataKey="month"
-                              tickLine={false}
-                              tickMargin={10}
-                              axisLine={false}
-                              stroke="hsl(var(--muted-foreground))"
-                          />
                           <YAxis
                               stroke="hsl(var(--muted-foreground))"
                               tickLine={false}
@@ -270,12 +271,35 @@ const Section = ({ title }: { title: string; }) => {
                     <Scoreboard title="Budget" value="$15,230" />
                     <Scoreboard title="Payment" value="$12,890" />
                 </div>
-                <p className="text-muted-foreground mt-4">
-                  {/* @ts-ignore */}
-                    {teamData[selectedTeam][title === 'Section 1' ? 'box1' : 'box2']}
-                </p>
                 <Separator className="bg-cyan-500/30 my-4" />
                 <ComparisonSection />
+                <Separator className="bg-cyan-500/30 my-4" />
+                <div className="space-y-4">
+                    <Card className="bg-slate-900/60 border-green-500/50">
+                        <CardHeader>
+                            <CardTitle className="text-base font-bold text-green-400">Highlights</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                                {teamData[selectedTeam].highlights.map((item, index) => (
+                                    <li key={index}>{item}</li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-slate-900/60 border-red-500/50">
+                        <CardHeader>
+                            <CardTitle className="text-base font-bold text-red-400">Lowlights</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                                {teamData[selectedTeam].lowlights.map((item, index) => (
+                                    <li key={index}>{item}</li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </div>
             </CardContent>
         </Card>
     );
