@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bar, BarChart, XAxis, YAxis, Legend, LabelList } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, LabelList } from "recharts";
 import { Calendar as CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 
@@ -167,13 +167,6 @@ const FilterDropdowns = () => (
 const ComparisonSection = () => {
     const [month1, setMonth1] = useState<Date | undefined>(new Date(2025, 6, 1));
     const [month2, setMonth2] = useState<Date | undefined>(new Date(2025, 7, 1));
-
-    const comparisonData = [
-        { team: "SMD", month1: 1200, month2: 1500 },
-        { team: "QAC", month1: 950, month2: 1100 },
-        { team: "CM", month1: 1600, month2: 1450 },
-        { team: "Class Ops", month1: 700, month2: 850 },
-    ];
     
     const chartData = [
         { month: format(month1 || new Date(), 'LLL'), fileCount: 1200, fill: "var(--color-month1)" },
@@ -192,7 +185,7 @@ const ComparisonSection = () => {
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-36 justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80",
+                                    "w-32 justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80",
                                     !month1 && "text-muted-foreground"
                                 )}
                             >
@@ -215,7 +208,7 @@ const ComparisonSection = () => {
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-36 justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80",
+                                    "w-32 justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80",
                                     !month2 && "text-muted-foreground"
                                 )}
                             >
@@ -259,14 +252,6 @@ const ComparisonSection = () => {
                               }
                           />
                           <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
-                          <Legend content={() => (
-                              <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-                                  <span>SMD</span>
-                                  <span>QAC</span>
-                                  <span>CM</span>
-                                  <span>Class Ops</span>
-                              </div>
-                          )} />
                           <Bar dataKey="fileCount" radius={4}>
                             <LabelList dataKey="fileCount" position="top" offset={10} className="fill-foreground font-semibold" />
                           </Bar>
