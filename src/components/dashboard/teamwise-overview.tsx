@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import {
   Card,
   CardContent,
@@ -17,6 +18,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Calendar } from "@/components/ui/calendar";
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+    ChartConfig
+} from "@/components/ui/chart";
+import type { DateRange } from "react-day-picker";
 
 const teams = [
   "Study Material Design",
@@ -74,6 +83,19 @@ const materialVerticalOptions = [
   "Practice Sheet",
 ];
 
+const comparisonChartData = [
+    { team: 'SMD', month1: 1200, month2: 1500 },
+    { team: 'QAC', month1: 950, month2: 1100 },
+    { team: 'CM', month1: 1600, month2: 1450 },
+    { team: 'Class Ops', month1: 700, month2: 850 },
+];
+
+const chartConfig = {
+    month1: { label: "Selected Month 1", color: "hsl(var(--chart-1))" },
+    month2: { label: "Selected Month 2", color: "hsl(var(--chart-2))" },
+} satisfies ChartConfig;
+
+
 const Scoreboard = ({ title, value }: { title: string; value: string }) => (
     <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30">
         <p className="text-sm text-muted-foreground">{title}</p>
@@ -114,6 +136,7 @@ const FilterDropdowns = () => (
 export default function TeamwiseOverview() {
   const [selectedTeam1, setSelectedTeam1] = useState(teams[0]);
   const [selectedTeam2, setSelectedTeam2] = useState(teams[1]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   return (
     <Card className="bg-card/50 border-cyan-500/50">
@@ -154,6 +177,45 @@ export default function TeamwiseOverview() {
                <p className="text-muted-foreground mt-4">
                 {teamData[selectedTeam1].box1}
               </p>
+              <Separator className="bg-cyan-500/30 my-4" />
+                <Card className="bg-slate-900/60 border-teal-500/50">
+                    <CardHeader>
+                        <CardTitle>Comparison</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                        <div className="flex justify-center">
+                             <Calendar
+                                mode="range"
+                                selected={dateRange}
+                                onSelect={setDateRange}
+                                numberOfMonths={2}
+                                className="rounded-md border border-teal-500/30"
+                            />
+                        </div>
+                        <div className="h-64">
+                            <ChartContainer config={chartConfig} className="w-full h-full">
+                                <BarChart accessibilityLayer data={comparisonChartData}>
+                                    <XAxis
+                                        dataKey="team"
+                                        tickLine={false}
+                                        tickMargin={10}
+                                        axisLine={false}
+                                        stroke="hsl(var(--muted-foreground))"
+                                    />
+                                    <YAxis
+                                        stroke="hsl(var(--muted-foreground))"
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={10}
+                                    />
+                                    <ChartTooltip content={<ChartTooltipContent />} />
+                                    <Bar dataKey="month1" fill="var(--color-month1)" radius={4} />
+                                    <Bar dataKey="month2" fill="var(--color-month2)" radius={4} />
+                                </BarChart>
+                            </ChartContainer>
+                        </div>
+                    </CardContent>
+                </Card>
             </CardContent>
           </Card>
           <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
