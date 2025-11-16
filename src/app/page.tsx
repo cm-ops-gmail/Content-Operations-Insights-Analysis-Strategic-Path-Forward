@@ -54,19 +54,40 @@ export default function Home() {
 
   const getTeamTotal = (teamData: any[][]) => {
     if (!teamData || teamData.length < 2) return 0;
-    // Sums up file counts from column E (index 4) for all rows, skipping the header
+    
+    // Find the "File Count" column index from header row, case-insensitive and trimmed
+    const headerRow = teamData[0];
+    const fileCountIndex = headerRow.findIndex((col: string) => 
+      col && col.toString().trim().toLowerCase() === 'file count'
+    );
+    
+    if (fileCountIndex === -1) return 0;
+    
+    // Sums up file counts for all rows, skipping the header
     return teamData.slice(1).reduce((sum, row) => {
-        const fileCount = parseInt(row[4], 10) || 0;
+        const fileCount = parseInt(row[fileCountIndex], 10) || 0;
         return sum + fileCount;
     }, 0);
   };
   
   const getTeamCurrentMonthTotal = (teamData: any[][], month: string) => {
     if (!teamData || teamData.length < 2) return 0;
-    // Sums up file counts from column E (index 4) for the specified month (column A, index 0)
+    
+    // Find the "File Count" and "Month" column indexes from header row, case-insensitive and trimmed
+    const headerRow = teamData[0];
+    const fileCountIndex = headerRow.findIndex((col: string) => 
+      col && col.toString().trim().toLowerCase() === 'file count'
+    );
+    const monthIndex = headerRow.findIndex((col: string) => 
+      col && col.toString().trim().toLowerCase() === 'month'
+    );
+    
+    if (fileCountIndex === -1 || monthIndex === -1) return 0;
+    
+    // Sums up file counts for the specified month
     return teamData.slice(1).reduce((sum, row) => {
-        if (row[0] === month) {
-            const fileCount = parseInt(row[4], 10) || 0;
+        if (row[monthIndex] && row[monthIndex].toString().toLowerCase() === month.toLowerCase()) {
+            const fileCount = parseInt(row[fileCountIndex], 10) || 0;
             return sum + fileCount;
         }
         return sum;
@@ -187,3 +208,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
