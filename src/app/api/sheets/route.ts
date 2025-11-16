@@ -2,6 +2,14 @@
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 
+const sheetNames = [
+  'SMD Analysis [Monthwise]',
+  'QAC Analysis [Monthwise]',
+  'CM Analysis [Monthwise]',
+  'Class_OPS Analysis [Monthwise]',
+  'Details',
+];
+
 export async function GET() {
   try {
     const auth = new google.auth.GoogleAuth({
@@ -14,16 +22,30 @@ export async function GET() {
 
     const sheets = google.sheets({ version: 'v4', auth });
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: "'SMD Analysis [Monthwise]'!A:I", // Corrected sheet name and range
-    });
+    const ranges = sheetNames.map(name => `'${name}'!A:I`); 
 
-    const rows = response.data.values;
-    if (rows) {
-      return NextResponse.json(rows);
+    const response = await sheets.spreadsheets.values.batchGet({
+      spreadsheetId: process.env.GOOGLE_SHEET_ID,
+      ranges,
+    });
+    
+    const valueRanges = response.data.valueRanges;
+
+    if (valueRanges && valueRanges.length > 0) {
+      const result = valueRanges.reduce((acc, valueRange, index) => {
+        const sheetName = sheetNames[index];
+        // Extract sheet name from range string like "'Sheet Name'!A:I"
+        const nameMatch = valueRange.range?.match(/'?([^!]+)'?!/);
+        if (nameMatch) {
+            const cleanName = nameMatch[1];
+            acc[cleanName] = valueRange.values || [];
+        }
+        return acc;
+      }, {} as Record<string, any[][]>);
+      return NextResponse.json(result);
     }
-    return NextResponse.json([]);
+
+    return NextResponse.json({});
 
   } catch (error: any) {
     console.error('Error fetching from Google Sheets API:', error);

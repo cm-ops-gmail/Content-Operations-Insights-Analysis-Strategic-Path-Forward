@@ -16,7 +16,7 @@ const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
 );
 
 export default function Home() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Record<string, any[][]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,11 +26,10 @@ export default function Home() {
         setLoading(true);
         setError(null);
         const response = await fetch('/api/sheets');
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to fetch data');
-        }
         const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to fetch data');
+        }
         setData(result);
       } catch (e: any) {
         setError(e.message);
@@ -47,8 +46,57 @@ export default function Home() {
     { name: "Content Management", abbreviation: "CM", total: 1530, current: 510 },
     { name: "Class Operations", abbreviation: "CO", total: 720, current: 240 },
   ];
+  
+  const smdData = data['SMD Analysis [Monthwise]'] || [];
+  const qacData = data['QAC Analysis [Monthwise]'] || [];
+  const cmData = data['CM Analysis [Monthwise]'] || [];
+  const classOpsData = data['Class_OPS Analysis [Monthwise]'] || [];
 
-  const chartData = teams.map(t => ({ team: t.abbreviation, fileCount: t.total }));
+  const getTeamTotal = (teamData: any[][]) => {
+      if (teamData.length < 2) return 0;
+      // Find the "Total" row, then sum up the file counts (assuming they are in columns E, F, G)
+      const totalRow = teamData.find(row => row[0] === 'Total');
+      if (totalRow) {
+          const july = parseInt(totalRow[4], 10) || 0;
+          const aug = parseInt(totalRow[5], 10) || 0;
+          const sept = parseInt(totalRow[6], 10) || 0;
+          return july + aug + sept;
+      }
+      return 0;
+  };
+  
+  const getTeamCurrentMonthTotal = (teamData: any[][]) => {
+      if (teamData.length < 2) return 0;
+      const totalRow = teamData.find(row => row[0] === 'Total');
+      if (totalRow) {
+          // Assuming the latest month is September in column G
+          return parseInt(totalRow[6], 10) || 0;
+      }
+      return 0;
+  }
+
+  const teamTotals = {
+      SMD: getTeamTotal(smdData),
+      QAC: getTeamTotal(qacData),
+      CM: getTeamTotal(cmData),
+      CO: getTeamTotal(classOpsData),
+  };
+
+  const teamCurrentTotals = {
+    SMD: getTeamCurrentMonthTotal(smdData),
+    QAC: getTeamCurrentMonthTotal(qacData),
+    CM: getTeamCurrentMonthTotal(cmData),
+    CO: getTeamCurrentMonthTotal(classOpsData),
+  };
+
+  const updatedTeams = teams.map(team => ({
+      ...team,
+      total: teamTotals[team.abbreviation as keyof typeof teamTotals] || team.total,
+      current: teamCurrentTotals[team.abbreviation as keyof typeof teamCurrentTotals] || team.current,
+  }));
+  
+  const chartData = updatedTeams.map(t => ({ team: t.abbreviation, fileCount: t.total }));
+
 
   if (loading) {
     return (
@@ -108,7 +156,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {teams.map((team) => (
+                  {updatedTeams.map((team) => (
                     <Card key={team.name} className="border-accent/50 hover:border-accent transition-colors flex flex-col">
                       <CardHeader className="flex flex-row items-center gap-4 pb-2">
                         <TeamIcon abbreviation={team.abbreviation} />
@@ -130,7 +178,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <TeamwiseOverview sheetData={data.length > 0 ? data : []} />
+            <TeamwiseOverview sheetData={Object.keys(data).length > 0 ? data : {}} />
 
             <PerformanceChart data={chartData} />
 

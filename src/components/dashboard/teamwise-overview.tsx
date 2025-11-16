@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Bar, BarChart, XAxis, YAxis, LabelList } from "recharts";
 import { Calendar as CalendarIcon, Wand2 } from "lucide-react"
 import { format } from "date-fns"
@@ -32,73 +32,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 
-const teams = [
-  "Study Material Design",
-  "Content Quality Assurance",
-  "Content Management",
-  "Class Operations",
-];
-
-const teamData: Record<string, { box1: string; box2: string, highlights: string[], lowlights: string[], insights: string }> = {
-  "Study Material Design": {
-    box1: "Details for Study Material Design - Section 1",
-    box2: "Details for Study Material Design - Section 2",
-    highlights: ["Increased file count by 20% in August.", "Budget surplus of $2,000 this quarter."],
-    lowlights: ["Payment processing delayed for 5 projects.", "Missed content deadline for 'Book Project'."],
-    insights: "Focus on automating payment reminders for pending projects to improve cash flow. Explore cloud storage solutions to manage budget overruns from file storage. Consider a sprint planning session for the 'Book Project' to realign on deadlines and deliverables."
-  },
-  "Content Quality Assurance": {
-    box1: "Details for Content Quality Assurance - Section 1",
-    box2: "Details for Content Quality Assurance - Section 2",
-    highlights: ["Reduced error rate by 15%.", "Achieved 99% SLA for all quality checks."],
-    lowlights: ["Understaffed for the 'Academics [Senior Segment]' project.", "Higher than average bugs in 'Weekly Quiz'."],
-    insights: "Leverage the success in error rate reduction by documenting best practices and sharing with other teams. Address understaffing by cross-training members from other teams or prioritizing QA tasks for the 'Academics [Senior Segment]' project. A deep-dive into the 'Weekly Quiz' bug reports could reveal a root cause."
-  },
-  "Content Management": {
-    box1: "Details for Content Management - Section 1",
-    box2: "Details for Content Management - Section 2",
-    highlights: ["Streamlined the 'LIVE Class Listing / Upload' process.", "100% on-time content delivery for 'Skills & English'."],
-    lowlights: ["Storage costs exceeded budget by 10%.", "Difficulty managing 'Practice Sheet' versions."],
-    insights: "The streamlined 'LIVE Class' process is a major win; apply similar principles to 'Practice Sheet' versioning. For storage costs, analyze file types and sizes to identify optimization opportunities like compression or archiving older content. Negotiating with the storage provider could also yield savings."
-  },
-  "Class Operations": {
-    box1: "Details for Class Operations - Section 1",
-    box2: "Details for Class Operations - Section 2",
-    highlights: ["Improved student satisfaction by 12%.", "Successfully onboarded 5 new instructors."],
-    lowlights: ["Technical issues during 3 'LIVE Class' sessions.", "Low attendance for 'IELTS Mock Test Listing'."],
-    insights: "The increase in student satisfaction is directly tied to the new instructors; ensure they receive ongoing support. Conduct a root cause analysis of the technical issues in 'LIVE Class' sessions to prevent recurrence. For 'IELTS Mock Test', survey students to understand the low attendance and adjust marketing or scheduling accordingly."
-  },
+const teamMap: Record<string, string> = {
+  "Study Material Design": "SMD Analysis [Monthwise]",
+  "Content Quality Assurance": "QAC Analysis [Monthwise]",
+  "Content Management": "CM Analysis [Monthwise]",
+  "Class Operations": "Class_OPS Analysis [Monthwise]",
 };
 
+const teams = Object.keys(teamMap);
+
 const months = ["July", "August", "September"];
-const teamAndProductOptions = [
-  "Academics [Junior Segment]",
-  "Academics [Senior Segment]",
-  "Book Project",
-  "Skills & English",
-];
-const materialVerticalOptions = [
-  "Course Listing",
-  "PDP Update",
-  "IELTS Mock Test Listing",
-  "Homework Listing / Assign",
-  "Lecture Slide",
-  "Lecture Sheet",
-  "Daily Quiz",
-  "Weekly Quiz",
-  "Weekly CQ",
-  "Monthly Quiz",
-  "Monthly CQ",
-  "Model Test Quiz",
-  "Model Test CQ",
-  "LIVE Class Listing / Upload",
-  "Record Shoot Listing / Upload",
-  "Monthly Quiz Written",
-  "Workbook",
-  "Math Exercise Solve",
-  "Book",
-  "Practice Sheet",
-];
 
 const chartConfig = {
   month1: { label: "Month 1", color: "hsl(var(--chart-1))" },
@@ -112,9 +55,9 @@ const Scoreboard = ({ title, value }: { title: string; value: string }) => (
   </div>
 );
 
-const FilterDropdowns = () => (
+const FilterDropdowns = ({ teamAndProductOptions, materialVerticalOptions, filters, setFilters }: any) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-    <Select>
+    <Select value={filters.month} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, month: value }))}>
       <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
         <SelectValue placeholder="Month" />
       </SelectTrigger>
@@ -126,24 +69,24 @@ const FilterDropdowns = () => (
         ))}
       </SelectContent>
     </Select>
-    <Select>
+    <Select value={filters.teamAndProduct} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, teamAndProduct: value }))}>
       <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
         <SelectValue placeholder="Team [Product]" />
       </SelectTrigger>
       <SelectContent className="border-cyan-500/80">
-        {teamAndProductOptions.map((category) => (
+        {teamAndProductOptions.map((category: string) => (
           <SelectItem key={category} value={category}>
             {category}
           </SelectItem>
         ))}
       </SelectContent>
     </Select>
-    <Select>
+    <Select value={filters.materialVertical} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, materialVertical: value }))}>
       <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
         <SelectValue placeholder="Material Vertical" />
       </SelectTrigger>
       <SelectContent className="border-cyan-500/80 max-h-60">
-        {materialVerticalOptions.map((option) => (
+        {materialVerticalOptions.map((option: string) => (
           <SelectItem key={option} value={option}>
             {option}
           </SelectItem>
@@ -245,12 +188,86 @@ const ComparisonSection = () => {
     )
 };
 
-const Section = ({ title, sheetData }: { title: string; sheetData: any[] }) => {
+const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][] }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
-    // Note: This is where you would filter `sheetData` based on `selectedTeam`
-    // For now, it uses mock data.
-    const currentTeamData = teamData[selectedTeam];
+    const [filters, setFilters] = useState({ month: '', teamAndProduct: '', materialVertical: '' });
 
+    const teamAndProductOptions = useMemo(() => {
+        if (!detailsData || detailsData.length <= 1) return [];
+        const header = detailsData[0];
+        const columnIndex = header.indexOf('Team [Product]');
+        if (columnIndex === -1) return [];
+        return [...new Set(detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean))];
+    }, [detailsData]);
+
+    const materialVerticalOptions = useMemo(() => {
+        if (!detailsData || detailsData.length <= 1) return [];
+        const header = detailsData[0];
+        const columnIndex = header.indexOf('Material Vertical');
+        if (columnIndex === -1) return [];
+        return [...new Set(detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean))];
+    }, [detailsData]);
+
+    const currentTeamSheetName = teamMap[selectedTeam];
+    const currentTeamData = sheetData[currentTeamSheetName] || [];
+
+    const { fileCount, budget, payment, highlights, lowlights, insights } = useMemo(() => {
+        if (currentTeamData.length === 0) {
+            return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '' };
+        }
+
+        const header = currentTeamData[0];
+        let fileCountValue = 0;
+        let budgetValue = 0;
+        let paymentValue = 0;
+
+        const totalRow = currentTeamData.find(row => row[0] === 'Total');
+        if(totalRow) {
+            const julyIndex = header.indexOf('File Count [July]');
+            const augIndex = header.indexOf('File Count [August]');
+            const septIndex = header.indexOf('File Count [September]');
+            
+            const julyCount = julyIndex > -1 ? (parseInt(totalRow[julyIndex], 10) || 0) : 0;
+            const augCount = augIndex > -1 ? (parseInt(totalRow[augIndex], 10) || 0) : 0;
+            const septCount = septIndex > -1 ? (parseInt(totalRow[septIndex], 10) || 0) : 0;
+            fileCountValue = julyCount + augCount + septCount;
+        }
+
+        const budgetRow = currentTeamData.find(row => row[0] === 'Budget');
+        if (budgetRow) {
+            const budgetIndex = header.indexOf('Cost');
+            if(budgetIndex > -1) {
+                budgetValue = parseFloat(budgetRow[budgetIndex].replace(/[^0-9.-]+/g,"")) || 0;
+            }
+        }
+        
+        const paymentRow = currentTeamData.find(row => row[0] === 'Payment');
+         if (paymentRow) {
+            const paymentIndex = header.indexOf('Cost');
+            if(paymentIndex > -1) {
+                paymentValue = parseFloat(paymentRow[paymentIndex].replace(/[^0-9.-]+/g,"")) || 0;
+            }
+        }
+
+        const highlightsRow = currentTeamData.find(row => row[0] === 'Highlights');
+        const highlightsText = highlightsRow ? highlightsRow[1] : '';
+
+        const lowlightsRow = currentTeamData.find(row => row[0] === 'Lowlights');
+        const lowlightsText = lowlightsRow ? lowlightsRow[1] : '';
+        
+        const insightsRow = currentTeamData.find(row => row[0] === 'Insights');
+        const insightsText = insightsRow ? insightsRow[1] : '';
+
+        return {
+            fileCount: fileCountValue.toLocaleString(),
+            budget: `$${budgetValue.toLocaleString()}`,
+            payment: `$${paymentValue.toLocaleString()}`,
+            highlights: highlightsText.split('\n').filter(Boolean),
+            lowlights: lowlightsText.split('\n').filter(Boolean),
+            insights: insightsText,
+        };
+
+    }, [currentTeamData]);
 
     return (
         <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
@@ -272,12 +289,17 @@ const Section = ({ title, sheetData }: { title: string; sheetData: any[] }) => {
                         </SelectContent>
                     </Select>
                 </div>
-                <FilterDropdowns />
+                <FilterDropdowns 
+                  teamAndProductOptions={teamAndProductOptions}
+                  materialVerticalOptions={materialVerticalOptions}
+                  filters={filters}
+                  setFilters={setFilters}
+                />
                 <Separator className="bg-cyan-500/30 my-2" />
                 <div className="grid grid-cols-3 gap-4">
-                    <Scoreboard title="File Count" value="1,280" />
-                    <Scoreboard title="Budget" value="$15,230" />
-                    <Scoreboard title="Payment" value="$12,890" />
+                    <Scoreboard title="File Count" value={fileCount} />
+                    <Scoreboard title="Budget" value={budget} />
+                    <Scoreboard title="Payment" value={payment} />
                 </div>
                 <Separator className="bg-cyan-500/30 my-4" />
                 <ComparisonSection />
@@ -289,7 +311,7 @@ const Section = ({ title, sheetData }: { title: string; sheetData: any[] }) => {
                         </CardHeader>
                         <CardContent>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                                {currentTeamData.highlights.map((item, index) => (
+                                {highlights.map((item, index) => (
                                     <li key={index}>{item}</li>
                                 ))}
                             </ul>
@@ -301,7 +323,7 @@ const Section = ({ title, sheetData }: { title: string; sheetData: any[] }) => {
                         </CardHeader>
                         <CardContent>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                                {currentTeamData.lowlights.map((item, index) => (
+                                {lowlights.map((item, index) => (
                                     <li key={index}>{item}</li>
                                 ))}
                             </ul>
@@ -318,7 +340,7 @@ const Section = ({ title, sheetData }: { title: string; sheetData: any[] }) => {
                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">{currentTeamData.insights}</p>
+                            <p className="text-sm text-muted-foreground">{insights}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -327,7 +349,8 @@ const Section = ({ title, sheetData }: { title: string; sheetData: any[] }) => {
     );
 }
 
-export default function TeamwiseOverview({ sheetData }: { sheetData: any[] }) {
+export default function TeamwiseOverview({ sheetData }: { sheetData: Record<string, any[][]> }) {
+    const detailsData = sheetData['Details'] || [];
     return (
         <Card className="bg-card/50 border-cyan-500/50">
             <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -340,8 +363,8 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: any[] }) {
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Section title="Section 1" sheetData={sheetData} />
-                    <Section title="Section 2" sheetData={sheetData} />
+                    <Section title="Section 1" sheetData={sheetData} detailsData={detailsData} />
+                    <Section title="Section 2" sheetData={sheetData} detailsData={detailsData} />
                 </div>
             </CardContent>
         </Card>
