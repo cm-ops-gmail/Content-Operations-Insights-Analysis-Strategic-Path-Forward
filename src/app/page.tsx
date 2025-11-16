@@ -1,7 +1,13 @@
+"use client";
+
+import { useState, useEffect } from 'react';
 import DashboardHeader from '@/components/dashboard/header';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import TeamwiseOverview from '@/components/dashboard/teamwise-overview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
 const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
   <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-accent/20 border border-accent/50">
@@ -9,10 +15,31 @@ const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
   </div>
 );
 
-export default async function Home() {
-  // const teamsData = await getSheetData('Sheet1!A:F');
-  const teamsData: any[] = [];
+export default function Home() {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/sheets');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch data');
+        }
+        const result = await response.json();
+        setData(result);
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+  
   const teams = [
     { name: "Study Material Design", abbreviation: "SMD", total: 1240, current: 450 },
     { name: "Content Quality Assurance", abbreviation: "QAC", total: 980, current: 320 },
@@ -21,6 +48,52 @@ export default async function Home() {
   ];
 
   const chartData = teams.map(t => ({ team: t.abbreviation, fileCount: t.total }));
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <DashboardHeader />
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
+          <div className="container mx-auto">
+            <div className="grid gap-6">
+              <Card className="bg-card/50">
+                <CardHeader>
+                  <CardTitle>Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-36" />)}
+                  </div>
+                </CardContent>
+              </Card>
+              <Skeleton className="h-96" />
+              <Skeleton className="h-96" />
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <DashboardHeader />
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
+          <div className="container mx-auto">
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Error Fetching Data</AlertTitle>
+              <AlertDescription>
+                <p>Could not load data from Google Sheets. Please ensure the API key and Sheet ID are correct, and that the sheet is shared with the service account email.</p>
+                <p className="font-mono text-xs mt-2">{error}</p>
+              </AlertDescription>
+            </Alert>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -56,7 +129,7 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <TeamwiseOverview sheetData={teamsData} />
+            <TeamwiseOverview sheetData={data} />
 
             <PerformanceChart data={chartData} />
 
