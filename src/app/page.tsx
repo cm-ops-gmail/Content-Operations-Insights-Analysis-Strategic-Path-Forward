@@ -2,6 +2,7 @@ import DashboardHeader from '@/components/dashboard/header';
 import KpiCard from '@/components/dashboard/kpi-card';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import ComparativeAnalysis from '@/components/dashboard/comparative-analysis';
+import TeamwiseOverview from '@/components/dashboard/teamwise-overview';
 import { TrendingUp, Users, Zap, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -79,6 +80,8 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
+
+            <TeamwiseOverview />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {kpiData.map((kpi, index) => (
