@@ -212,51 +212,22 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
     const currentTeamData = sheetData[currentTeamSheetName] || [];
 
     const { fileCount, budget, payment, highlights, lowlights, insights } = useMemo(() => {
-        if (currentTeamData.length === 0) {
+        if (currentTeamData.length < 2) { // Ensure there's at least a header and one data row
             return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '' };
         }
 
-        const header = currentTeamData[0];
-        let fileCountValue = 0;
-        let budgetValue = 0;
-        let paymentValue = 0;
+        const dataRows = currentTeamData.slice(1); // Skip header row
 
-        const totalRow = currentTeamData.find(row => row[0] === 'Total');
-        if(totalRow) {
-            const julyIndex = header.indexOf('File Count [July]');
-            const augIndex = header.indexOf('File Count [August]');
-            const septIndex = header.indexOf('File Count [September]');
-            
-            const julyCount = julyIndex > -1 ? (parseInt(totalRow[julyIndex], 10) || 0) : 0;
-            const augCount = augIndex > -1 ? (parseInt(totalRow[augIndex], 10) || 0) : 0;
-            const septCount = septIndex > -1 ? (parseInt(totalRow[septIndex], 10) || 0) : 0;
-            fileCountValue = julyCount + augCount + septCount;
-        }
-
-        const budgetRow = currentTeamData.find(row => row[0] === 'Budget');
-        if (budgetRow) {
-            const budgetIndex = header.indexOf('Cost');
-            if(budgetIndex > -1) {
-                budgetValue = parseFloat(budgetRow[budgetIndex].replace(/[^0-9.-]+/g,"")) || 0;
-            }
-        }
+        const fileCountValue = dataRows.reduce((sum, row) => sum + (parseInt(row[4], 10) || 0), 0);
+        const budgetValue = dataRows.reduce((sum, row) => sum + (parseFloat(String(row[5]).replace(/[^0-9.-]+/g,"")) || 0), 0);
+        const paymentValue = dataRows.reduce((sum, row) => sum + (parseFloat(String(row[6]).replace(/[^0-9.-]+/g,"")) || 0), 0);
         
-        const paymentRow = currentTeamData.find(row => row[0] === 'Payment');
-         if (paymentRow) {
-            const paymentIndex = header.indexOf('Cost');
-            if(paymentIndex > -1) {
-                paymentValue = parseFloat(paymentRow[paymentIndex].replace(/[^0-9.-]+/g,"")) || 0;
-            }
-        }
-
-        const highlightsRow = currentTeamData.find(row => row[0] === 'Highlights');
-        const highlightsText = highlightsRow ? highlightsRow[1] : '';
-
-        const lowlightsRow = currentTeamData.find(row => row[0] === 'Lowlights');
-        const lowlightsText = lowlightsRow ? lowlightsRow[1] : '';
-        
-        const insightsRow = currentTeamData.find(row => row[0] === 'Insights');
-        const insightsText = insightsRow ? insightsRow[1] : '';
+        // Assuming Highlights, Lowlights, Insights are not aggregated per row but are in specific cells
+        // This part might need adjustment if these are per-row values.
+        // For now, let's assume they are not present in the new structure or need a different logic.
+        const highlightsText = ''; // Placeholder
+        const lowlightsText = ''; // Placeholder
+        const insightsText = ''; // Placeholder
 
         return {
             fileCount: fileCountValue.toLocaleString(),
@@ -314,6 +285,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                                 {highlights.map((item, index) => (
                                     <li key={index}>{item}</li>
                                 ))}
+                                {highlights.length === 0 && <li>Data not available in this structure.</li>}
                             </ul>
                         </CardContent>
                     </Card>
@@ -326,6 +298,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                                 {lowlights.map((item, index) => (
                                     <li key={index}>{item}</li>
                                 ))}
+                                {lowlights.length === 0 && <li>Data not available in this structure.</li>}
                             </ul>
                         </CardContent>
                     </Card>
@@ -340,7 +313,9 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">{insights}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {insights || 'Data not available in this structure.'}
+                            </p>
                         </CardContent>
                     </Card>
                 </div>

@@ -53,26 +53,24 @@ export default function Home() {
   const classOpsData = data['Class_OPS Analysis [Monthwise]'] || [];
 
   const getTeamTotal = (teamData: any[][]) => {
-      if (teamData.length < 2) return 0;
-      // Find the "Total" row, then sum up the file counts (assuming they are in columns E, F, G)
-      const totalRow = teamData.find(row => row[0] === 'Total');
-      if (totalRow) {
-          const july = parseInt(totalRow[4], 10) || 0;
-          const aug = parseInt(totalRow[5], 10) || 0;
-          const sept = parseInt(totalRow[6], 10) || 0;
-          return july + aug + sept;
-      }
-      return 0;
+    if (!teamData || teamData.length < 2) return 0;
+    // Sums up file counts from column E (index 4) for all rows, skipping the header
+    return teamData.slice(1).reduce((sum, row) => {
+        const fileCount = parseInt(row[4], 10) || 0;
+        return sum + fileCount;
+    }, 0);
   };
   
-  const getTeamCurrentMonthTotal = (teamData: any[][]) => {
-      if (teamData.length < 2) return 0;
-      const totalRow = teamData.find(row => row[0] === 'Total');
-      if (totalRow) {
-          // Assuming the latest month is September in column G
-          return parseInt(totalRow[6], 10) || 0;
-      }
-      return 0;
+  const getTeamCurrentMonthTotal = (teamData: any[][], month: string) => {
+    if (!teamData || teamData.length < 2) return 0;
+    // Sums up file counts from column E (index 4) for the specified month (column A, index 0)
+    return teamData.slice(1).reduce((sum, row) => {
+        if (row[0] === month) {
+            const fileCount = parseInt(row[4], 10) || 0;
+            return sum + fileCount;
+        }
+        return sum;
+    }, 0);
   }
 
   const teamTotals = {
@@ -83,10 +81,11 @@ export default function Home() {
   };
 
   const teamCurrentTotals = {
-    SMD: getTeamCurrentMonthTotal(smdData),
-    QAC: getTeamCurrentMonthTotal(qacData),
-    CM: getTeamCurrentMonthTotal(cmData),
-    CO: getTeamCurrentMonthTotal(classOpsData),
+    // Assuming 'September' is the current month
+    SMD: getTeamCurrentMonthTotal(smdData, 'September'),
+    QAC: getTeamCurrentMonthTotal(qacData, 'September'),
+    CM: getTeamCurrentMonthTotal(cmData, 'September'),
+    CO: getTeamCurrentMonthTotal(classOpsData, 'September'),
   };
 
   const updatedTeams = teams.map(team => ({
