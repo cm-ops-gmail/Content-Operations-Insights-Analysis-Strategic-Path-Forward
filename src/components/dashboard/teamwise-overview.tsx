@@ -165,8 +165,8 @@ const FilterDropdowns = () => (
 );
 
 const ComparisonSection = () => {
-    const [month1, setMonth1] = useState<Date | undefined>(new Date(2024, 6, 1));
-    const [month2, setMonth2] = useState<Date | undefined>(new Date(2024, 7, 1));
+    const [month1, setMonth1] = useState<Date | undefined>(new Date(2025, 6, 1));
+    const [month2, setMonth2] = useState<Date | undefined>(new Date(2025, 7, 1));
 
     const comparisonData = [
         { team: "SMD", month1: 1200, month2: 1500 },
@@ -192,7 +192,7 @@ const ComparisonSection = () => {
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-48 justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80",
+                                    "w-36 justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80",
                                     !month1 && "text-muted-foreground"
                                 )}
                             >
@@ -215,7 +215,7 @@ const ComparisonSection = () => {
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-48 justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80",
+                                    "w-36 justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80",
                                     !month2 && "text-muted-foreground"
                                 )}
                             >
