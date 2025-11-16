@@ -11,8 +11,8 @@ const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
 );
 
 export default async function Home() {
-  // const teamsData = await getSheetData('Sheet1!A:F'); // Example range, adjust as needed
-  const teamsData: any[] = []; // Using empty array until data fetching is implemented
+  // const teamsData = await getSheetData('Sheet1!A:F');
+  const teamsData: any[] = [];
 
   const teams = [
     { name: "Study Material Design", abbreviation: "SMD", total: 1240, current: 450 },
