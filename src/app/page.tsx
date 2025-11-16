@@ -3,6 +3,7 @@ import KpiCard from '@/components/dashboard/kpi-card';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import ComparativeAnalysis from '@/components/dashboard/comparative-analysis';
 import { TrendingUp, Users, Zap, Activity } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
   const kpiData = [
@@ -32,12 +33,31 @@ export default function Home() {
     },
   ];
 
+  const teams = ["SMD", "QAC", "CM", "Class Ops"];
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <DashboardHeader />
       <main className="flex-1 p-4 md:p-6 lg:p-8">
         <div className="container mx-auto">
           <div className="grid gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Overview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {teams.map((team) => (
+                    <Card key={team}>
+                      <CardHeader className="items-center justify-center p-4">
+                        <CardTitle className="text-base font-bold">{team}</CardTitle>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {kpiData.map((kpi, index) => (
                 <KpiCard
