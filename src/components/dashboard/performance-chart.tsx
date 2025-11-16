@@ -16,19 +16,31 @@ import {
 } from "@/components/ui/chart"
 
 const chartData = [
-  { month: "July", views: 186000, engagement: 4.5, growth: 1500 },
-  { month: "August", views: 305000, engagement: 5.2, growth: 2100 },
-  { month: "September", views: 237000, engagement: 4.8, growth: 1400 },
+  { team: "SMD", fileCount: 1240 },
+  { team: "CM", fileCount: 1530 },
+  { team: "QAC", fileCount: 980 },
+  { team: "Class Ops", fileCount: 720 },
 ]
 
 const chartConfig = {
-  views: {
-    label: "Views",
+  fileCount: {
+    label: "File Count",
+  },
+  SMD: {
+    label: "SMD",
     color: "hsl(var(--chart-1))",
   },
-  engagement: {
-    label: "Engagement",
+  CM: {
+    label: "CM",
     color: "hsl(var(--chart-2))",
+  },
+  QAC: {
+    label: "QAC",
+    color: "hsl(var(--chart-3))",
+  },
+  "Class Ops": {
+    label: "Class Ops",
+    color: "hsl(var(--chart-4))",
   },
 } satisfies ChartConfig
 
@@ -36,27 +48,36 @@ export default function PerformanceChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Q3 Performance Overview</CardTitle>
-        <CardDescription>July - September 2024</CardDescription>
+        <CardTitle>Overall File Count by Team</CardTitle>
+        <CardDescription>Total files processed by each team</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-64 w-full">
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              top: 20,
+              right: 20,
+              bottom: 20,
+              left: 20,
+            }}
+          >
             <XAxis
-              dataKey="month"
+              dataKey="team"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
               stroke="hsl(var(--muted-foreground))"
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <YAxis
+              dataKey="fileCount"
               stroke="hsl(var(--muted-foreground))"
               tickLine={false}
               axisLine={false}
               tickMargin={10}
               tickFormatter={(value) =>
-                typeof value === 'number' && value > 1000
+                typeof value === 'number' && value >= 1000
                   ? `${value / 1000}k`
                   : `${value}`
               }
@@ -65,8 +86,19 @@ export default function PerformanceChart() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" />}
             />
-            <Bar dataKey="views" fill="var(--color-views)" radius={4} />
-            <Bar dataKey="engagement" fill="var(--color-engagement)" radius={4} />
+            <Bar
+              dataKey="fileCount"
+              radius={4}
+              fill="hsl(var(--chart-1))"
+            >
+              {chartData.map((entry, index) => (
+                <Bar
+                  key={`bar-${index}`}
+                  dataKey="fileCount"
+                  fill={chartConfig[entry.team as keyof typeof chartConfig]?.color || 'hsl(var(--chart-1))'}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ChartContainer>
       </CardContent>
