@@ -2,6 +2,7 @@ import DashboardHeader from '@/components/dashboard/header';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import TeamwiseOverview from '@/components/dashboard/teamwise-overview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getSheetData } from '@/lib/google-sheets';
 
 const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
   <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-accent/20 border border-accent/50">
@@ -9,13 +10,19 @@ const TeamIcon = ({ abbreviation }: { abbreviation: string }) => (
   </div>
 );
 
-export default function Home() {
+export default async function Home() {
+  // const teamsData = await getSheetData('Sheet1!A:F'); // Example range, adjust as needed
+  const teamsData: any[] = []; // Using empty array until data fetching is implemented
+
   const teams = [
     { name: "Study Material Design", abbreviation: "SMD", total: 1240, current: 450 },
     { name: "Content Quality Assurance", abbreviation: "QAC", total: 980, current: 320 },
     { name: "Content Management", abbreviation: "CM", total: 1530, current: 510 },
     { name: "Class Operations", abbreviation: "CO", total: 720, current: 240 },
   ];
+
+  // This will be replaced by actual data from Google Sheets once the integration is complete
+  const chartData = teams.map(t => ({ team: t.abbreviation, fileCount: t.total }));
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -51,9 +58,9 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <TeamwiseOverview />
+            <TeamwiseOverview sheetData={teamsData} />
 
-            <PerformanceChart />
+            <PerformanceChart data={chartData} />
 
           </div>
         </div>

@@ -174,7 +174,7 @@ const ComparisonSection = () => {
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-32 justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80",
+                                    "w-36 justify-start text-left font-normal bg-cyan-900/50 border-cyan-500 hover:bg-cyan-900/80 text-xs",
                                     !month1 && "text-muted-foreground"
                                 )}
                             >
@@ -197,7 +197,7 @@ const ComparisonSection = () => {
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-32 justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80",
+                                    "w-36 justify-start text-left font-normal bg-purple-900/50 border-purple-500 hover:bg-purple-900/80 text-xs",
                                     !month2 && "text-muted-foreground"
                                 )}
                             >
@@ -245,8 +245,12 @@ const ComparisonSection = () => {
     )
 };
 
-const Section = ({ title }: { title: string; }) => {
+const Section = ({ title, sheetData }: { title: string; sheetData: any[] }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
+    // Note: This is where you would filter `sheetData` based on `selectedTeam`
+    // For now, it uses mock data.
+    const currentTeamData = teamData[selectedTeam];
+
 
     return (
         <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
@@ -285,7 +289,7 @@ const Section = ({ title }: { title: string; }) => {
                         </CardHeader>
                         <CardContent>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                                {teamData[selectedTeam].highlights.map((item, index) => (
+                                {currentTeamData.highlights.map((item, index) => (
                                     <li key={index}>{item}</li>
                                 ))}
                             </ul>
@@ -297,7 +301,7 @@ const Section = ({ title }: { title: string; }) => {
                         </CardHeader>
                         <CardContent>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                                {teamData[selectedTeam].lowlights.map((item, index) => (
+                                {currentTeamData.lowlights.map((item, index) => (
                                     <li key={index}>{item}</li>
                                 ))}
                             </ul>
@@ -314,7 +318,7 @@ const Section = ({ title }: { title: string; }) => {
                            </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">{teamData[selectedTeam].insights}</p>
+                            <p className="text-sm text-muted-foreground">{currentTeamData.insights}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -323,7 +327,7 @@ const Section = ({ title }: { title: string; }) => {
     );
 }
 
-export default function TeamwiseOverview() {
+export default function TeamwiseOverview({ sheetData }: { sheetData: any[] }) {
     return (
         <Card className="bg-card/50 border-cyan-500/50">
             <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -336,12 +340,10 @@ export default function TeamwiseOverview() {
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Section title="Section 1" />
-                    <Section title="Section 2" />
+                    <Section title="Section 1" sheetData={sheetData} />
+                    <Section title="Section 2" sheetData={sheetData} />
                 </div>
             </CardContent>
         </Card>
     );
 }
-
-    

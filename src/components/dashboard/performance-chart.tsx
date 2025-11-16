@@ -15,13 +15,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { team: "SMD", fileCount: 1240 },
-  { team: "CM", fileCount: 1530 },
-  { team: "QAC", fileCount: 980 },
-  { team: "Class Ops", fileCount: 720 },
-]
-
 const chartConfig = {
   fileCount: {
     label: "File Count",
@@ -44,7 +37,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default function PerformanceChart() {
+export default function PerformanceChart({ data }: { data: any[] }) {
   return (
     <Card>
       <CardHeader>
@@ -55,7 +48,7 @@ export default function PerformanceChart() {
         <ChartContainer config={chartConfig} className="h-64 w-full">
           <BarChart
             accessibilityLayer
-            data={chartData}
+            data={data}
             margin={{
               top: 20,
               right: 20,
@@ -91,7 +84,7 @@ export default function PerformanceChart() {
               radius={4}
               fill="hsl(var(--chart-1))"
             >
-              {chartData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Bar
                   key={`bar-${index}`}
                   dataKey="fileCount"
