@@ -194,18 +194,20 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
 
     const teamAndProductOptions = useMemo(() => {
         if (!detailsData || detailsData.length <= 1) return [];
-        const header = detailsData[0];
-        const columnIndex = header.findIndex((h: string) => h?.trim().toLowerCase() === 'team [product]');
+        const header = detailsData[0].map(h => String(h).trim().toLowerCase());
+        const columnIndex = header.findIndex(h => h === 'team [product]');
         if (columnIndex === -1) return [];
-        return [...new Set(detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean))];
+        const options = detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean);
+        return [...new Set(options)];
     }, [detailsData]);
 
     const materialVerticalOptions = useMemo(() => {
         if (!detailsData || detailsData.length <= 1) return [];
-        const header = detailsData[0];
-        const columnIndex = header.findIndex((h: string) => h?.trim().toLowerCase() === 'material vertical');
+        const header = detailsData[0].map(h => String(h).trim().toLowerCase());
+        const columnIndex = header.findIndex(h => h === 'material vertical');
         if (columnIndex === -1) return [];
-        return [...new Set(detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean))];
+        const options = detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean);
+        return [...new Set(options)];
     }, [detailsData]);
 
     const currentTeamSheetName = teamMap[selectedTeam];
@@ -216,10 +218,10 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
             return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '' };
         }
     
-        const headerRow = currentTeamData[0];
+        const headerRow = currentTeamData[0].map(h => String(h).trim().toLowerCase());
         const dataRows = currentTeamData.slice(1);
     
-        const getIndex = (name: string) => headerRow.findIndex(col => col && col.toString().trim().toLowerCase() === name.toLowerCase());
+        const getIndex = (name: string) => headerRow.findIndex(h => h === name.toLowerCase());
     
         const fileCountIndex = getIndex('File Count');
         const budgetIndex = getIndex('Budget');
@@ -228,21 +230,33 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
         const lowlightsIndex = getIndex('Lowlights');
         const insightsIndex = getIndex('Strategic Path Forward');
 
-        const fileCountValue = dataRows.reduce((sum, row) => sum + (parseInt(row[fileCountIndex], 10) || 0), 0);
-        const budgetValue = dataRows.reduce((sum, row) => sum + (parseFloat(String(row[budgetIndex]).replace(/[^0-9.-]+/g,"")) || 0), 0);
-        const paymentValue = dataRows.reduce((sum, row) => sum + (parseFloat(String(row[paymentIndex]).replace(/[^0-9.-]+/g,"")) || 0), 0);
+        const sumColumn = (index: number, isCurrency: boolean = false) => {
+            if (index === -1) return 0;
+            return dataRows.reduce((sum, row) => {
+                const cellValue = row[index];
+                if (isCurrency) {
+                    return sum + (parseFloat(String(cellValue).replace(/[^0-9.-]+/g, "")) || 0);
+                }
+                return sum + (parseInt(String(cellValue).replace(/,/g, ''), 10) || 0);
+            }, 0);
+        };
         
-        const highlightsText = highlightsIndex !== -1 ? dataRows.map(row => row[highlightsIndex]).filter(Boolean).join('\n') : '';
-        const lowlightsText = lowlightsIndex !== -1 ? dataRows.map(row => row[lowlightsIndex]).filter(Boolean).join('\n') : '';
-        const insightsText = insightsIndex !== -1 ? dataRows.map(row => row[insightsIndex]).filter(Boolean).join('\n') : '';
+        const fileCountValue = sumColumn(fileCountIndex);
+        const budgetValue = sumColumn(budgetIndex, true);
+        const paymentValue = sumColumn(paymentIndex, true);
+        
+        const getColumnText = (index: number): string[] => {
+            if (index === -1) return [];
+            return dataRows.map(row => row[index]).filter(Boolean).join('\n').split('\n').filter(Boolean);
+        };
 
         return {
             fileCount: fileCountValue.toLocaleString(),
             budget: `$${budgetValue.toLocaleString()}`,
             payment: `$${paymentValue.toLocaleString()}`,
-            highlights: highlightsText.split('\n').filter(Boolean),
-            lowlights: lowlightsText.split('\n').filter(Boolean),
-            insights: insightsText,
+            highlights: getColumnText(highlightsIndex),
+            lowlights: getColumnText(lowlightsIndex),
+            insights: getColumnText(insightsIndex).join(' '),
         };
 
     }, [currentTeamData]);
@@ -289,10 +303,9 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                         </CardHeader>
                         <CardContent>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                                {highlights.map((item, index) => (
+                                {highlights.length > 0 ? highlights.map((item, index) => (
                                     <li key={index}>{item}</li>
-                                ))}
-                                {highlights.length === 0 && <li>Data not available in this structure.</li>}
+                                )) : <li>Data not available.</li>}
                             </ul>
                         </CardContent>
                     </Card>
@@ -302,10 +315,9 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                         </CardHeader>
                         <CardContent>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                                {lowlights.map((item, index) => (
+                                {lowlights.length > 0 ? lowlights.map((item, index) => (
                                     <li key={index}>{item}</li>
-                                ))}
-                                {lowlights.length === 0 && <li>Data not available in this structure.</li>}
+                                )) : <li>Data not available.</li>}
                             </ul>
                         </CardContent>
                     </Card>
@@ -321,7 +333,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                         </CardHeader>
                         <CardContent>
                             <p className="text-sm text-muted-foreground">
-                                {insights || 'Data not available in this structure.'}
+                                {insights || 'Data not available.'}
                             </p>
                         </CardContent>
                     </Card>

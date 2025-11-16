@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -41,79 +42,54 @@ export default function Home() {
   }, []);
   
   const teams = [
-    { name: "Study Material Design", abbreviation: "SMD", total: 0, current: 0 },
-    { name: "Content Quality Assurance", abbreviation: "QAC", total: 0, current: 0 },
-    { name: "Content Management", abbreviation: "CM", total: 0, current: 0 },
-    { name: "Class Operations", abbreviation: "CO", total: 0, current: 0 },
+    { name: "Study Material Design", abbreviation: "SMD", sheet: "SMD Analysis [Monthwise]", total: 0, current: 0 },
+    { name: "Content Quality Assurance", abbreviation: "QAC", sheet: "QAC Analysis [Monthwise]", total: 0, current: 0 },
+    { name: "Content Management", abbreviation: "CM", sheet: "CM Analysis [Monthwise]", total: 0, current: 0 },
+    { name: "Class Operations", abbreviation: "CO", sheet: "Class_OPS Analysis [Monthwise]", total: 0, current: 0 },
   ];
   
-  const smdData = data['SMD Analysis [Monthwise]'] || [];
-  const qacData = data['QAC Analysis [Monthwise]'] || [];
-  const cmData = data['CM Analysis [Monthwise]'] || [];
-  const classOpsData = data['Class_OPS Analysis [Monthwise]'] || [];
-
-  const getTeamTotal = (teamData: any[][]) => {
+  const getTeamTotal = (teamData: any[][], columnName: string): number => {
     if (!teamData || teamData.length < 2) return 0;
     
-    // Find the "File Count" column index from header row, case-insensitive and trimmed
-    const headerRow = teamData[0];
-    const fileCountIndex = headerRow.findIndex((col: string) => 
-      col && col.toString().trim().toLowerCase() === 'file count'
-    );
+    const headerRow = teamData[0].map(h => String(h).trim().toLowerCase());
+    const columnIndex = headerRow.findIndex(h => h === columnName.trim().toLowerCase());
     
-    if (fileCountIndex === -1) return 0;
+    if (columnIndex === -1) return 0;
     
-    // Sums up file counts for all rows, skipping the header
     return teamData.slice(1).reduce((sum, row) => {
-        const fileCount = parseInt(row[fileCountIndex], 10) || 0;
+        const cellValue = row[columnIndex];
+        const fileCount = parseInt(String(cellValue).replace(/,/g, ''), 10) || 0;
         return sum + fileCount;
     }, 0);
   };
   
-  const getTeamCurrentMonthTotal = (teamData: any[][], month: string) => {
+  const getTeamCurrentMonthTotal = (teamData: any[][], month: string): number => {
     if (!teamData || teamData.length < 2) return 0;
     
-    // Find the "File Count" and "Month" column indexes from header row, case-insensitive and trimmed
-    const headerRow = teamData[0];
-    const fileCountIndex = headerRow.findIndex((col: string) => 
-      col && col.toString().trim().toLowerCase() === 'file count'
-    );
-    const monthIndex = headerRow.findIndex((col: string) => 
-      col && col.toString().trim().toLowerCase() === 'month'
-    );
+    const headerRow = teamData[0].map(h => String(h).trim().toLowerCase());
+    const fileCountIndex = headerRow.findIndex(h => h === 'file count');
+    const monthIndex = headerRow.findIndex(h => h === 'month');
     
     if (fileCountIndex === -1 || monthIndex === -1) return 0;
     
-    // Sums up file counts for the specified month
     return teamData.slice(1).reduce((sum, row) => {
-        if (row[monthIndex] && row[monthIndex].toString().toLowerCase() === month.toLowerCase()) {
-            const fileCount = parseInt(row[fileCountIndex], 10) || 0;
+        if (row[monthIndex] && String(row[monthIndex]).trim().toLowerCase() === month.toLowerCase()) {
+            const cellValue = row[fileCountIndex];
+            const fileCount = parseInt(String(cellValue).replace(/,/g, ''), 10) || 0;
             return sum + fileCount;
         }
         return sum;
     }, 0);
   }
 
-  const teamTotals = {
-      SMD: getTeamTotal(smdData),
-      QAC: getTeamTotal(qacData),
-      CM: getTeamTotal(cmData),
-      CO: getTeamTotal(classOpsData),
-  };
-
-  const teamCurrentTotals = {
-    // Assuming 'September' is the current month
-    SMD: getTeamCurrentMonthTotal(smdData, 'September'),
-    QAC: getTeamCurrentMonthTotal(qacData, 'September'),
-    CM: getTeamCurrentMonthTotal(cmData, 'September'),
-    CO: getTeamCurrentMonthTotal(classOpsData, 'September'),
-  };
-
-  const updatedTeams = teams.map(team => ({
-      ...team,
-      total: teamTotals[team.abbreviation as keyof typeof teamTotals] || 0,
-      current: teamCurrentTotals[team.abbreviation as keyof typeof teamCurrentTotals] || 0,
-  }));
+  const updatedTeams = teams.map(team => {
+      const teamData = data[team.sheet] || [];
+      return {
+          ...team,
+          total: getTeamTotal(teamData, 'File Count'),
+          current: getTeamCurrentMonthTotal(teamData, 'September'),
+      }
+  });
   
   const chartData = updatedTeams.map(t => ({ team: t.abbreviation, fileCount: t.total }));
 
@@ -208,5 +184,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

@@ -22,7 +22,7 @@ export async function GET() {
 
     const sheets = google.sheets({ version: 'v4', auth });
 
-    const ranges = sheetNames.map(name => `'${name}'!A:I`); 
+    const ranges = sheetNames.map(name => `'${name}'!A:K`); 
 
     const response = await sheets.spreadsheets.values.batchGet({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
@@ -33,13 +33,9 @@ export async function GET() {
 
     if (valueRanges && valueRanges.length > 0) {
       const result = valueRanges.reduce((acc, valueRange, index) => {
+        // Use the pre-defined sheetName to avoid issues with range parsing
         const sheetName = sheetNames[index];
-        // Extract sheet name from range string like "'Sheet Name'!A:I"
-        const nameMatch = valueRange.range?.match(/'?([^!]+)'?!/);
-        if (nameMatch) {
-            const cleanName = nameMatch[1];
-            acc[cleanName] = valueRange.values || [];
-        }
+        acc[sheetName] = valueRange.values || [];
         return acc;
       }, {} as Record<string, any[][]>);
       return NextResponse.json(result);
