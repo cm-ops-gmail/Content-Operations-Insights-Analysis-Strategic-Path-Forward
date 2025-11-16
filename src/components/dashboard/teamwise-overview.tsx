@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -20,10 +20,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
 import {
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-    ChartConfig
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartConfig,
 } from "@/components/ui/chart";
 import type { DateRange } from "react-day-picker";
 
@@ -84,59 +84,116 @@ const materialVerticalOptions = [
 ];
 
 const comparisonChartData = [
-    { team: 'SMD', month1: 1200, month2: 1500 },
-    { team: 'QAC', month1: 950, month2: 1100 },
-    { team: 'CM', month1: 1600, month2: 1450 },
-    { team: 'Class Ops', month1: 700, month2: 850 },
+  { team: "SMD", month1: 1200, month2: 1500 },
+  { team: "QAC", month1: 950, month2: 1100 },
+  { team: "CM", month1: 1600, month2: 1450 },
+  { team: "Class Ops", month1: 700, month2: 850 },
 ];
 
 const chartConfig = {
-    month1: { label: "Selected Month 1", color: "hsl(var(--chart-1))" },
-    month2: { label: "Selected Month 2", color: "hsl(var(--chart-2))" },
+  month1: { label: "Selected Month 1", color: "hsl(var(--chart-1))" },
+  month2: { label: "Selected Month 2", color: "hsl(var(--chart-2))" },
 } satisfies ChartConfig;
 
-
 const Scoreboard = ({ title, value }: { title: string; value: string }) => (
-    <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30">
-        <p className="text-sm text-muted-foreground">{title}</p>
-        <p className="text-2xl font-bold text-foreground">{value}</p>
-    </div>
+  <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30">
+    <p className="text-sm text-muted-foreground">{title}</p>
+    <p className="text-2xl font-bold text-foreground">{value}</p>
+  </div>
 );
 
 const FilterDropdowns = () => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-        <Select>
-            <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-                <SelectValue placeholder="Month" />
-            </SelectTrigger>
-            <SelectContent className="border-cyan-500/80">
-                {months.map(month => <SelectItem key={month} value={month}>{month}</SelectItem>)}
-            </SelectContent>
-        </Select>
-        <Select>
-            <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-                <SelectValue placeholder="Team [Product]" />
-            </SelectTrigger>
-            <SelectContent className="border-cyan-500/80">
-                {teamAndProductOptions.map(category => <SelectItem key={category} value={category}>{category}</SelectItem>)}
-            </SelectContent>
-        </Select>
-        <Select>
-            <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-                <SelectValue placeholder="Material Vertical" />
-            </SelectTrigger>
-            <SelectContent className="border-cyan-500/80 max-h-60">
-                {materialVerticalOptions.map(option => <SelectItem key={option} value={option}>{option}</SelectItem>)}
-            </SelectContent>
-        </Select>
-    </div>
-)
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+    <Select>
+      <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+        <SelectValue placeholder="Month" />
+      </SelectTrigger>
+      <SelectContent className="border-cyan-500/80">
+        {months.map((month) => (
+          <SelectItem key={month} value={month}>
+            {month}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    <Select>
+      <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+        <SelectValue placeholder="Team [Product]" />
+      </SelectTrigger>
+      <SelectContent className="border-cyan-500/80">
+        {teamAndProductOptions.map((category) => (
+          <SelectItem key={category} value={category}>
+            {category}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    <Select>
+      <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+        <SelectValue placeholder="Material Vertical" />
+      </SelectTrigger>
+      <SelectContent className="border-cyan-500/80 max-h-60">
+        {materialVerticalOptions.map((option) => (
+          <SelectItem key={option} value={option}>
+            {option}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  </div>
+);
 
+const ComparisonSection = ({ dateRange, setDateRange }: { dateRange: DateRange | undefined, setDateRange: (range: DateRange | undefined) => void }) => (
+  <Card className="bg-slate-900/60 border-teal-500/50 mt-4">
+    <CardHeader>
+      <CardTitle>Comparison</CardTitle>
+    </CardHeader>
+    <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+      <div className="md:col-span-2 flex justify-center">
+        <Calendar
+          mode="range"
+          selected={dateRange}
+          onSelect={setDateRange}
+          numberOfMonths={2}
+          className="rounded-md border border-teal-500/30 p-2"
+        />
+      </div>
+      <div className="md:col-span-3 h-64">
+        <ChartContainer config={chartConfig} className="w-full h-full">
+          <BarChart accessibilityLayer data={comparisonChartData}>
+            <XAxis
+              dataKey="team"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              stroke="hsl(var(--muted-foreground))"
+            />
+            <YAxis
+              stroke="hsl(var(--muted-foreground))"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={10}
+              tickFormatter={(value) =>
+                typeof value === 'number' && value > 1000
+                  ? `${value / 1000}k`
+                  : `${value}`
+              }
+            />
+            <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
+            <Bar dataKey="month1" fill="var(--color-month1)" radius={4} />
+            <Bar dataKey="month2" fill="var(--color-month2)" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export default function TeamwiseOverview() {
   const [selectedTeam1, setSelectedTeam1] = useState(teams[0]);
   const [selectedTeam2, setSelectedTeam2] = useState(teams[1]);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [dateRange1, setDateRange1] = useState<DateRange | undefined>();
+  const [dateRange2, setDateRange2] = useState<DateRange | undefined>();
 
   return (
     <Card className="bg-card/50 border-cyan-500/50">
@@ -169,59 +226,22 @@ export default function TeamwiseOverview() {
             <CardContent className="flex-1 flex flex-col gap-4">
               <FilterDropdowns />
               <Separator className="bg-cyan-500/30 my-2" />
-               <div className="grid grid-cols-3 gap-4">
-                  <Scoreboard title="File Count" value="1,280" />
-                  <Scoreboard title="Budget" value="$15,230" />
-                  <Scoreboard title="Payment" value="$12,890" />
+              <div className="grid grid-cols-3 gap-4">
+                <Scoreboard title="File Count" value="1,280" />
+                <Scoreboard title="Budget" value="$15,230" />
+                <Scoreboard title="Payment" value="$12,890" />
               </div>
-               <p className="text-muted-foreground mt-4">
+              <p className="text-muted-foreground mt-4">
                 {teamData[selectedTeam1].box1}
               </p>
               <Separator className="bg-cyan-500/30 my-4" />
-                <Card className="bg-slate-900/60 border-teal-500/50">
-                    <CardHeader>
-                        <CardTitle>Comparison</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                        <div className="flex justify-center">
-                             <Calendar
-                                mode="range"
-                                selected={dateRange}
-                                onSelect={setDateRange}
-                                numberOfMonths={2}
-                                className="rounded-md border border-teal-500/30"
-                            />
-                        </div>
-                        <div className="h-64">
-                            <ChartContainer config={chartConfig} className="w-full h-full">
-                                <BarChart accessibilityLayer data={comparisonChartData}>
-                                    <XAxis
-                                        dataKey="team"
-                                        tickLine={false}
-                                        tickMargin={10}
-                                        axisLine={false}
-                                        stroke="hsl(var(--muted-foreground))"
-                                    />
-                                    <YAxis
-                                        stroke="hsl(var(--muted-foreground))"
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickMargin={10}
-                                    />
-                                    <ChartTooltip content={<ChartTooltipContent />} />
-                                    <Bar dataKey="month1" fill="var(--color-month1)" radius={4} />
-                                    <Bar dataKey="month2" fill="var(--color-month2)" radius={4} />
-                                </BarChart>
-                            </ChartContainer>
-                        </div>
-                    </CardContent>
-                </Card>
+              <ComparisonSection dateRange={dateRange1} setDateRange={setDateRange1} />
             </CardContent>
           </Card>
           <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
             <CardHeader>
               <CardTitle className="text-lg">Section 2</CardTitle>
-               <div className="pt-2">
+              <div className="pt-2">
                 <Select value={selectedTeam2} onValueChange={setSelectedTeam2}>
                   <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500">
                     <SelectValue placeholder="Select a team" />
@@ -238,15 +258,17 @@ export default function TeamwiseOverview() {
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
               <FilterDropdowns />
-               <Separator className="bg-cyan-500/30 my-2" />
-               <div className="grid grid-cols-3 gap-4">
-                   <Scoreboard title="File Count" value="950" />
-                   <Scoreboard title="Budget" value="$22,500" />
-                   <Scoreboard title="Payment" value="$19,750" />
+              <Separator className="bg-cyan-500/30 my-2" />
+              <div className="grid grid-cols-3 gap-4">
+                <Scoreboard title="File Count" value="950" />
+                <Scoreboard title="Budget" value="$22,500" />
+                <Scoreboard title="Payment" value="$19,750" />
               </div>
               <p className="text-muted-foreground mt-4">
                 {teamData[selectedTeam2].box2}
               </p>
+              <Separator className="bg-cyan-500/30 my-4" />
+              <ComparisonSection dateRange={dateRange2} setDateRange={setDateRange2} />
             </CardContent>
           </Card>
         </div>
