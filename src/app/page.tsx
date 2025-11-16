@@ -85,7 +85,7 @@ export default function Home() {
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Error Fetching Data</AlertTitle>
               <AlertDescription>
-                <p>Could not load data from Google Sheets. Please ensure the API key and Sheet ID are correct, and that the sheet is shared with the service account email.</p>
+                <p>Could not load data from Google Sheets.</p>
                 <p className="font-mono text-xs mt-2">{error}</p>
               </AlertDescription>
             </Alert>
