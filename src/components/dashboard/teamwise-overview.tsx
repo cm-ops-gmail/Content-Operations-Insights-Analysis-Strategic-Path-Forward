@@ -123,7 +123,7 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
       </Select>
     </div>
     <div className="space-y-2">
-      <Label htmlFor="team-product" className="text-xs text-muted-foreground">Team [Product]</Label>
+      <Label htmlFor="team-product" className="text-xs text-muted-foreground">Select the Team</Label>
       <Select value={filters.teamAndProduct} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, teamAndProduct: value }))}>
         <SelectTrigger id="team-product" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
           <SelectValue placeholder="Team [Product]" />
@@ -229,7 +229,7 @@ const AiInsightSection = ({ data, isSection1 }: { data: any, isSection1: boolean
               <p className="text-muted-foreground">{analysis.summary}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-foreground mb-1">Analysis</h4>
+              <h4 className="font-semibold text-foreground mb-1">Insights</h4>
               <p className="text-muted-foreground">{analysis.insights}</p>
             </div>
             {analysis.recommendations && (
@@ -514,13 +514,11 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
                     <Scoreboard title="Payment" value={payment} />
                 </div>
                 
-                {!isSection1 && (
-                    <div className="mt-2">
-                        <Button onClick={() => setPopupOpen(true)} className="w-full" variant="outline">
-                            View Breakdown
-                        </Button>
-                    </div>
-                )}
+                <div className="mt-2">
+                    <Button onClick={() => setPopupOpen(true)} className="w-full" variant="outline">
+                        View Breakdown
+                    </Button>
+                </div>
                 
                 <Separator className="bg-cyan-500/30 my-4" />
 
@@ -555,16 +553,14 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
                     />
                 </div>
             </CardContent>
-            {!isSection1 && (
-                <BreakdownPopup 
-                    isOpen={isPopupOpen}
-                    onClose={() => setPopupOpen(false)}
-                    teamName={selectedTeam}
-                    breakdownData={breakdownData}
-                    startMonth={filters.startMonth}
-                    endMonth={filters.endMonth}
-                />
-            )}
+            <BreakdownPopup 
+                isOpen={isPopupOpen}
+                onClose={() => setPopupOpen(false)}
+                teamName={selectedTeam}
+                breakdownData={breakdownData}
+                startMonth={filters.startMonth}
+                endMonth={filters.endMonth}
+            />
         </Card>
     );
 }
