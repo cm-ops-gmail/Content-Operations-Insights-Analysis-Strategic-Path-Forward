@@ -4,7 +4,7 @@
 import { useState, useMemo } from "react";
 import { Bar, BarChart, XAxis, YAxis, LabelList } from "recharts";
 import { Calendar as CalendarIcon, Wand2 } from "lucide-react"
-import { format } from "date-fns"
+import { format, getMonth, getYear, parse } from "date-fns"
 
 import {
   Card,
@@ -19,6 +19,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -41,7 +43,21 @@ const teamMap: Record<string, string> = {
 
 const teams = Object.keys(teamMap);
 
-const months = ["July", "August", "September"];
+const generateMonthOptions = () => {
+    const options: { year: number, months: string[] }[] = [];
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    
+    for (const year of [2025, 2026]) {
+        options.push({
+            year,
+            months: monthNames.map(month => `${month} ${year}`)
+        });
+    }
+    return options;
+};
+
+const monthOptions = generateMonthOptions();
+
 
 const teamAndProductOptions = [
   "Academics [Junior Segment]",
@@ -86,16 +102,34 @@ const Scoreboard = ({ title, value }: { title: string; value: string }) => (
 );
 
 const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-    <Select value={filters.month} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, month: value }))}>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+    <Select value={filters.startMonth} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, startMonth: value }))}>
       <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-        <SelectValue placeholder="Month" />
+        <SelectValue placeholder="Start Month" />
       </SelectTrigger>
       <SelectContent className="border-cyan-500/80">
-        {months.map((month) => (
-          <SelectItem key={month} value={month}>
-            {month}
-          </SelectItem>
+        {monthOptions.map(group => (
+            <SelectGroup key={group.year}>
+                <SelectLabel>{group.year}</SelectLabel>
+                {group.months.map(month => (
+                    <SelectItem key={month} value={month}>{month}</SelectItem>
+                ))}
+            </SelectGroup>
+        ))}
+      </SelectContent>
+    </Select>
+    <Select value={filters.endMonth} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, endMonth: value }))}>
+      <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+        <SelectValue placeholder="End Month" />
+      </SelectTrigger>
+      <SelectContent className="border-cyan-500/80">
+        {monthOptions.map(group => (
+            <SelectGroup key={group.year}>
+                <SelectLabel>{group.year}</SelectLabel>
+                {group.months.map(month => (
+                    <SelectItem key={month} value={month}>{month}</SelectItem>
+                ))}
+            </SelectGroup>
         ))}
       </SelectContent>
     </Select>
@@ -220,7 +254,7 @@ const ComparisonSection = () => {
 
 const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][] }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
-    const [filters, setFilters] = useState({ month: '', teamAndProduct: '', materialVertical: '' });
+    const [filters, setFilters] = useState({ startMonth: '', endMonth: '', teamAndProduct: '', materialVertical: '' });
 
     const materialVerticalOptions = materialVerticalOptionsList;
 
@@ -248,19 +282,74 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
       const insightsIndex = getIndex('strategic path forward');
 
       // Filter rows based on dropdown selections
-      if (filters.month && monthIndex !== -1) {
-        dataRows = dataRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === filters.month.toLowerCase());
+      const { startMonth, endMonth, teamAndProduct, materialVertical } = filters;
+
+      if (teamAndProduct && teamAndProductIndex !== -1) {
+        dataRows = dataRows.filter(row => String(row[teamAndProductIndex]).trim().toLowerCase() === teamAndProduct.toLowerCase());
       }
-      if (filters.teamAndProduct && teamAndProductIndex !== -1) {
-        dataRows = dataRows.filter(row => String(row[teamAndProductIndex]).trim().toLowerCase() === filters.teamAndProduct.toLowerCase());
+      if (materialVertical && materialVerticalIndex !== -1) {
+        dataRows = dataRows.filter(row => String(row[materialVerticalIndex]).trim().toLowerCase() === materialVertical.toLowerCase());
       }
-      if (filters.materialVertical && materialVerticalIndex !== -1) {
-        dataRows = dataRows.filter(row => String(row[materialVerticalIndex]).trim().toLowerCase() === filters.materialVertical.toLowerCase());
+
+      // Date range filtering
+      if (startMonth && endMonth && monthIndex !== -1) {
+          const startDate = parse(startMonth, "MMMM yyyy", new Date());
+          const endDate = parse(endMonth, "MMMM yyyy", new Date());
+
+          if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+              dataRows = dataRows.filter(row => {
+                  const rowMonthStr = row[monthIndex];
+                  if (!rowMonthStr) return false;
+
+                  const rowDate = parse(rowMonthStr, "MMMM", new Date());
+                  // Assume current year if not specified. This might need adjustment if your data spans multiple years.
+                  // For this case, we'll check against a simple month index comparison.
+                  const currentYear = new Date().getFullYear();
+                  
+                  // A better approach is to parse month and year from selection
+                  const startYear = getYear(startDate);
+                  const startMonthIndex = getMonth(startDate);
+                  const endYear = getYear(endDate);
+                  const endMonthIndex = getMonth(endDate);
+
+                  const rowSheetYear = // Attempt to get year from sheet, or assume a year if not present
+                    rowMonthStr.match(/\d{4}/) 
+                    ? parseInt(rowMonthStr.match(/\d{4}/)![0], 10)
+                    : (rowMonthStr.toLowerCase() === "july" || rowMonthStr.toLowerCase() === "august" || rowMonthStr.toLowerCase() === "september" ? 2024 : currentYear);
+
+
+                  const rowDateWithYear = parse(rowMonthStr, "MMMM", new Date(rowSheetYear, 0, 1));
+                  
+                  return rowDateWithYear >= startDate && rowDateWithYear <= endDate;
+              });
+          }
+      } else if (startMonth && monthIndex !== -1) {
+          const startDate = parse(startMonth, "MMMM yyyy", new Date());
+          if (!isNaN(startDate.getTime())) {
+              dataRows = dataRows.filter(row => {
+                  const rowMonthStr = row[monthIndex];
+                  if (!rowMonthStr) return false;
+                  const rowDate = parse(rowMonthStr, "MMMM yyyy", new Date()); // Assuming sheet has "Month Year" format
+                  return !isNaN(rowDate.getTime()) && rowDate >= startDate;
+              });
+          }
+      } else if (endMonth && monthIndex !== -1) {
+          const endDate = parse(endMonth, "MMMM yyyy", new Date());
+          if (!isNaN(endDate.getTime())) {
+              dataRows = dataRows.filter(row => {
+                  const rowMonthStr = row[monthIndex];
+                  if (!rowMonthStr) return false;
+                  const rowDate = parse(rowMonthStr, "MMMM yyyy", new Date()); // Assuming sheet has "Month Year" format
+                  return !isNaN(rowDate.getTime()) && rowDate <= endDate;
+              });
+          }
       }
+
   
       const sumColumn = (index: number, isCurrency: boolean = false) => {
           if (index === -1) return 0;
           return dataRows.reduce((sum, row) => {
+              if(row.length <= index) return sum;
               const cellValue = row[index];
               if (isCurrency) {
                   return sum + (parseFloat(String(cellValue).replace(/[^0-9.-]+/g, "")) || 0);
@@ -275,7 +364,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
       
       const getColumnText = (index: number): string[] => {
           if (index === -1) return [];
-          return dataRows.map(row => row[index]).filter(Boolean).join('\n').split('\n').filter(Boolean);
+          return dataRows.map(row => row.length > index ? row[index] : null).filter(Boolean).join('\n').split('\n').filter(Boolean);
       };
 
       return {
@@ -392,3 +481,5 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
