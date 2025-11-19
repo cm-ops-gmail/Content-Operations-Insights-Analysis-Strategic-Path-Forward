@@ -282,6 +282,12 @@ const BreakdownPopup = ({
     return null;
   };
 
+  const getBarColor = (efficiency: number) => {
+    if (efficiency < 0) return 'hsl(var(--destructive))'; // Red
+    if (efficiency >= 100) return 'hsl(var(--chart-2))'; // Green
+    return 'hsl(var(--chart-4))'; // Yellow/Orange
+  };
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -325,7 +331,7 @@ const BreakdownPopup = ({
             </div>
           </div>
           <div className="flex flex-col h-full">
-            <h3 className="text-lg font-semibold text-foreground mb-2">Efficiency Chart</h3>
+            <h3 className="text-lg font-bold text-cyan-400 mb-2">Efficiency Chart</h3>
             <div className="flex-grow border border-cyan-500/30 rounded-lg p-4">
                 {breakdownData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
@@ -335,7 +341,7 @@ const BreakdownPopup = ({
                             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(71, 85, 105, 0.3)' }}/>
                             <Bar dataKey="efficiency">
                                 {chartData.map((entry, index) => (
-                                    <Bar key={`cell-${index}`} fill={entry.efficiency >= 0 ? 'hsl(var(--chart-4))' : 'hsl(var(--destructive))'} />
+                                    <Bar key={`cell-${index}`} fill={getBarColor(entry.efficiency)} />
                                 ))}
                                 <LabelList dataKey="efficiency" position="right" formatter={(value: number) => `${value.toFixed(1)}%`} fontSize={10} fill="white" />
                             </Bar>
