@@ -33,6 +33,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+
 
 const teamMap: Record<string, string> = {
   "Study Material Design": "SMD Analysis [Monthwise]",
@@ -92,53 +94,66 @@ const Scoreboard = ({ title, value }: { title: string; value: string }) => (
 );
 
 const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-    <Select value={filters.startMonth} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, startMonth: value }))}>
-      <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-        <SelectValue placeholder="Start Month" />
-      </SelectTrigger>
-      <SelectContent className="border-cyan-500/80">
-        {monthOptions.map(month => (
-            <SelectItem key={month} value={month}>{month}</SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-    <Select value={filters.endMonth} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, endMonth: value }))}>
-      <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-        <SelectValue placeholder="End Month" />
-      </SelectTrigger>
-      <SelectContent className="border-cyan-500/80">
-        {monthOptions.map(month => (
-            <SelectItem key={month} value={month}>{month}</SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-    <Select value={filters.teamAndProduct} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, teamAndProduct: value }))}>
-      <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-        <SelectValue placeholder="Team [Product]" />
-      </SelectTrigger>
-      <SelectContent className="border-cyan-500/80">
-        {teamAndProductOptions.map((category: string) => (
-          <SelectItem key={category} value={category}>
-            {category}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-    <Select value={filters.materialVertical} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, materialVertical: value }))}>
-      <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-        <SelectValue placeholder="Material Vertical" />
-      </SelectTrigger>
-      <SelectContent className="border-cyan-500/80 max-h-60">
-        {materialVerticalOptions.map((option: string) => (
-          <SelectItem key={option} value={option}>
-            {option}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-2">
+      <Label htmlFor="start-month" className="text-xs text-muted-foreground">Start Month</Label>
+      <Select value={filters.startMonth} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, startMonth: value }))}>
+        <SelectTrigger id="start-month" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+          <SelectValue placeholder="Start Month" />
+        </SelectTrigger>
+        <SelectContent className="border-cyan-500/80">
+          {monthOptions.map(month => (
+              <SelectItem key={month} value={month}>{month}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+    <div className="space-y-2">
+      <Label htmlFor="end-month" className="text-xs text-muted-foreground">End Month</Label>
+      <Select value={filters.endMonth} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, endMonth: value }))}>
+        <SelectTrigger id="end-month" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+          <SelectValue placeholder="End Month" />
+        </SelectTrigger>
+        <SelectContent className="border-cyan-500/80">
+          {monthOptions.map(month => (
+              <SelectItem key={month} value={month}>{month}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+    <div className="space-y-2">
+      <Label htmlFor="team-product" className="text-xs text-muted-foreground">Team [Product]</Label>
+      <Select value={filters.teamAndProduct} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, teamAndProduct: value }))}>
+        <SelectTrigger id="team-product" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+          <SelectValue placeholder="Team [Product]" />
+        </SelectTrigger>
+        <SelectContent className="border-cyan-500/80">
+          {teamAndProductOptions.map((category: string) => (
+            <SelectItem key={category} value={category}>
+              {category}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+    <div className="space-y-2">
+      <Label htmlFor="material-vertical" className="text-xs text-muted-foreground">Material Vertical</Label>
+      <Select value={filters.materialVertical} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, materialVertical: value }))}>
+        <SelectTrigger id="material-vertical" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
+          <SelectValue placeholder="Material Vertical" />
+        </SelectTrigger>
+        <SelectContent className="border-cyan-500/80 max-h-60">
+          {materialVerticalOptions.map((option: string) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   </div>
 );
+
 
 const ComparisonSection = () => {
     const [month1, setMonth1] = useState<Date | undefined>(new Date(2025, 6, 1));
