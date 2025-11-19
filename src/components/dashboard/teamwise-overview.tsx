@@ -43,6 +43,13 @@ const teams = Object.keys(teamMap);
 
 const months = ["July", "August", "September"];
 
+const teamAndProductOptions = [
+  "Academics [Junior Segment]",
+  "Academics [Senior Segment]",
+  "Book Project",
+  "Skills & English",
+];
+
 const chartConfig = {
   month1: { label: "Month 1", color: "hsl(var(--chart-1))" },
   month2: { label: "Month 2", color: "hsl(var(--chart-2))" },
@@ -55,7 +62,7 @@ const Scoreboard = ({ title, value }: { title: string; value: string }) => (
   </div>
 );
 
-const FilterDropdowns = ({ teamAndProductOptions, materialVerticalOptions, filters, setFilters }: any) => (
+const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
     <Select value={filters.month} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, month: value }))}>
       <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
@@ -192,15 +199,6 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
     const [filters, setFilters] = useState({ month: '', teamAndProduct: '', materialVertical: '' });
 
-    const teamAndProductOptions = useMemo(() => {
-        if (!detailsData || detailsData.length <= 1) return [];
-        const header = detailsData[0].map(h => String(h).trim().toLowerCase());
-        const columnIndex = header.findIndex(h => h === 'team [product]');
-        if (columnIndex === -1) return [];
-        const options = detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean);
-        return [...new Set(options)];
-    }, [detailsData]);
-
     const materialVerticalOptions = useMemo(() => {
         if (!detailsData || detailsData.length <= 1) return [];
         const header = detailsData[0].map(h => String(h).trim().toLowerCase());
@@ -214,52 +212,63 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
     const currentTeamData = sheetData[currentTeamSheetName] || [];
 
     const { fileCount, budget, payment, highlights, lowlights, insights } = useMemo(() => {
-        if (currentTeamData.length < 2) { 
-            return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '' };
-        }
-    
-        const headerRow = currentTeamData[0].map(h => String(h).trim().toLowerCase());
-        const dataRows = currentTeamData.slice(1);
-    
-        const getIndex = (name: string) => headerRow.findIndex(h => h === name.toLowerCase());
-    
-        const fileCountIndex = getIndex('File Count');
-        const budgetIndex = getIndex('Budget');
-        const paymentIndex = getIndex('Payment [Paid]');
-        const highlightsIndex = getIndex('Highlights');
-        const lowlightsIndex = getIndex('Lowlights');
-        const insightsIndex = getIndex('Strategic Path Forward');
+      if (currentTeamData.length < 2) {
+          return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '' };
+      }
+  
+      const headerRow = currentTeamData[0].map(h => String(h).trim().toLowerCase());
+      let dataRows = currentTeamData.slice(1);
+  
+      const getIndex = (name: string) => headerRow.findIndex(h => h === name.toLowerCase());
+  
+      const monthIndex = getIndex('month');
+      const teamAndProductIndex = getIndex('team [product]');
+      const fileCountIndex = getIndex('file count');
+      const budgetIndex = getIndex('budget');
+      const paymentIndex = getIndex('payment [paid]');
+      const highlightsIndex = getIndex('highlights');
+      const lowlightsIndex = getIndex('lowlights');
+      const insightsIndex = getIndex('strategic path forward');
 
-        const sumColumn = (index: number, isCurrency: boolean = false) => {
-            if (index === -1) return 0;
-            return dataRows.reduce((sum, row) => {
-                const cellValue = row[index];
-                if (isCurrency) {
-                    return sum + (parseFloat(String(cellValue).replace(/[^0-9.-]+/g, "")) || 0);
-                }
-                return sum + (parseInt(String(cellValue).replace(/,/g, ''), 10) || 0);
-            }, 0);
-        };
-        
-        const fileCountValue = sumColumn(fileCountIndex);
-        const budgetValue = sumColumn(budgetIndex, true);
-        const paymentValue = sumColumn(paymentIndex, true);
-        
-        const getColumnText = (index: number): string[] => {
-            if (index === -1) return [];
-            return dataRows.map(row => row[index]).filter(Boolean).join('\n').split('\n').filter(Boolean);
-        };
+      // Filter rows based on dropdown selections
+      if (filters.month && monthIndex !== -1) {
+        dataRows = dataRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === filters.month.toLowerCase());
+      }
+      if (filters.teamAndProduct && teamAndProductIndex !== -1) {
+        dataRows = dataRows.filter(row => String(row[teamAndProductIndex]).trim() === filters.teamAndProduct);
+      }
+  
+      const sumColumn = (index: number, isCurrency: boolean = false) => {
+          if (index === -1) return 0;
+          return dataRows.reduce((sum, row) => {
+              const cellValue = row[index];
+              if (isCurrency) {
+                  return sum + (parseFloat(String(cellValue).replace(/[^0-9.-]+/g, "")) || 0);
+              }
+              return sum + (parseInt(String(cellValue).replace(/,/g, ''), 10) || 0);
+          }, 0);
+      };
+      
+      const fileCountValue = sumColumn(fileCountIndex);
+      const budgetValue = sumColumn(budgetIndex, true);
+      const paymentValue = sumColumn(paymentIndex, true);
+      
+      const getColumnText = (index: number): string[] => {
+          if (index === -1) return [];
+          return dataRows.map(row => row[index]).filter(Boolean).join('\n').split('\n').filter(Boolean);
+      };
 
-        return {
-            fileCount: fileCountValue.toLocaleString(),
-            budget: `$${budgetValue.toLocaleString()}`,
-            payment: `$${paymentValue.toLocaleString()}`,
-            highlights: getColumnText(highlightsIndex),
-            lowlights: getColumnText(lowlightsIndex),
-            insights: getColumnText(insightsIndex).join(' '),
-        };
+      return {
+          fileCount: fileCountValue.toLocaleString(),
+          budget: `$${budgetValue.toLocaleString()}`,
+          payment: `$${paymentValue.toLocaleString()}`,
+          highlights: getColumnText(highlightsIndex),
+          lowlights: getColumnText(lowlightsIndex),
+          insights: getColumnText(insightsIndex).join(' '),
+      };
 
-    }, [currentTeamData]);
+  }, [currentTeamData, filters]);
+
 
     return (
         <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
@@ -282,7 +291,6 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                     </Select>
                 </div>
                 <FilterDropdowns 
-                  teamAndProductOptions={teamAndProductOptions}
                   materialVerticalOptions={materialVerticalOptions}
                   filters={filters}
                   setFilters={setFilters}
