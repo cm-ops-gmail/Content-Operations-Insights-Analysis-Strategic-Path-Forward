@@ -4,7 +4,7 @@
 import { useState, useMemo } from "react";
 import { Bar, BarChart, XAxis, YAxis, LabelList } from "recharts";
 import { Calendar as CalendarIcon, Wand2 } from "lucide-react"
-import { format, getMonth, getYear, parse } from "date-fns"
+import { format, getMonth, parse } from "date-fns"
 
 import {
   Card,
@@ -43,20 +43,10 @@ const teamMap: Record<string, string> = {
 
 const teams = Object.keys(teamMap);
 
-const generateMonthOptions = () => {
-    const options: { year: number, months: string[] }[] = [];
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    
-    for (const year of [2025, 2026]) {
-        options.push({
-            year,
-            months: monthNames.map(month => `${month} ${year}`)
-        });
-    }
-    return options;
-};
-
-const monthOptions = generateMonthOptions();
+const monthOptions = [
+    "January", "February", "March", "April", "May", "June", 
+    "July", "August", "September", "October", "November", "December"
+];
 
 
 const teamAndProductOptions = [
@@ -108,13 +98,8 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
         <SelectValue placeholder="Start Month" />
       </SelectTrigger>
       <SelectContent className="border-cyan-500/80">
-        {monthOptions.map(group => (
-            <SelectGroup key={group.year}>
-                <SelectLabel>{group.year}</SelectLabel>
-                {group.months.map(month => (
-                    <SelectItem key={month} value={month}>{month}</SelectItem>
-                ))}
-            </SelectGroup>
+        {monthOptions.map(month => (
+            <SelectItem key={month} value={month}>{month}</SelectItem>
         ))}
       </SelectContent>
     </Select>
@@ -123,13 +108,8 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
         <SelectValue placeholder="End Month" />
       </SelectTrigger>
       <SelectContent className="border-cyan-500/80">
-        {monthOptions.map(group => (
-            <SelectGroup key={group.year}>
-                <SelectLabel>{group.year}</SelectLabel>
-                {group.months.map(month => (
-                    <SelectItem key={month} value={month}>{month}</SelectItem>
-                ))}
-            </SelectGroup>
+        {monthOptions.map(month => (
+            <SelectItem key={month} value={month}>{month}</SelectItem>
         ))}
       </SelectContent>
     </Select>
@@ -293,56 +273,20 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
 
       // Date range filtering
       if (startMonth && endMonth && monthIndex !== -1) {
-          const startDate = parse(startMonth, "MMMM yyyy", new Date());
-          const endDate = parse(endMonth, "MMMM yyyy", new Date());
+          const startIndex = monthOptions.indexOf(startMonth);
+          const endIndex = monthOptions.indexOf(endMonth);
 
-          if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+          if (startIndex !== -1 && endIndex !== -1 && startIndex <= endIndex) {
+              const validMonths = monthOptions.slice(startIndex, endIndex + 1).map(m => m.toLowerCase());
               dataRows = dataRows.filter(row => {
-                  const rowMonthStr = row[monthIndex];
-                  if (!rowMonthStr) return false;
-
-                  const rowDate = parse(rowMonthStr, "MMMM", new Date());
-                  // Assume current year if not specified. This might need adjustment if your data spans multiple years.
-                  // For this case, we'll check against a simple month index comparison.
-                  const currentYear = new Date().getFullYear();
-                  
-                  // A better approach is to parse month and year from selection
-                  const startYear = getYear(startDate);
-                  const startMonthIndex = getMonth(startDate);
-                  const endYear = getYear(endDate);
-                  const endMonthIndex = getMonth(endDate);
-
-                  const rowSheetYear = // Attempt to get year from sheet, or assume a year if not present
-                    rowMonthStr.match(/\d{4}/) 
-                    ? parseInt(rowMonthStr.match(/\d{4}/)![0], 10)
-                    : (rowMonthStr.toLowerCase() === "july" || rowMonthStr.toLowerCase() === "august" || rowMonthStr.toLowerCase() === "september" ? 2024 : currentYear);
-
-
-                  const rowDateWithYear = parse(rowMonthStr, "MMMM", new Date(rowSheetYear, 0, 1));
-                  
-                  return rowDateWithYear >= startDate && rowDateWithYear <= endDate;
+                  const rowMonth = String(row[monthIndex]).trim().toLowerCase();
+                  return validMonths.includes(rowMonth);
               });
           }
       } else if (startMonth && monthIndex !== -1) {
-          const startDate = parse(startMonth, "MMMM yyyy", new Date());
-          if (!isNaN(startDate.getTime())) {
-              dataRows = dataRows.filter(row => {
-                  const rowMonthStr = row[monthIndex];
-                  if (!rowMonthStr) return false;
-                  const rowDate = parse(rowMonthStr, "MMMM yyyy", new Date()); // Assuming sheet has "Month Year" format
-                  return !isNaN(rowDate.getTime()) && rowDate >= startDate;
-              });
-          }
+            dataRows = dataRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === startMonth.toLowerCase());
       } else if (endMonth && monthIndex !== -1) {
-          const endDate = parse(endMonth, "MMMM yyyy", new Date());
-          if (!isNaN(endDate.getTime())) {
-              dataRows = dataRows.filter(row => {
-                  const rowMonthStr = row[monthIndex];
-                  if (!rowMonthStr) return false;
-                  const rowDate = parse(rowMonthStr, "MMMM yyyy", new Date()); // Assuming sheet has "Month Year" format
-                  return !isNaN(rowDate.getTime()) && rowDate <= endDate;
-              });
-          }
+            dataRows = dataRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === endMonth.toLowerCase());
       }
 
   
