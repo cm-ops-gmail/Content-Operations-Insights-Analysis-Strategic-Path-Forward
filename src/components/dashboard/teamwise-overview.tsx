@@ -154,14 +154,13 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
   </div>
 );
 
-const AiInsightSection = ({ data, isSection1 }: { data: any, isSection1: boolean }) => {
+const AiInsightSection = ({ data }: { data: any }) => {
   const [analysis, setAnalysis] = useState<AnalyzeQ3PerformanceOutput | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialState, setInitialState] = useState(true);
 
   const handleAnalyze = async () => {
-    if (!isSection1) return;
     setLoading(true);
     setError(null);
     setInitialState(false);
@@ -199,16 +198,14 @@ const AiInsightSection = ({ data, isSection1 }: { data: any, isSection1: boolean
             Insights
           </CardTitle>
         </div>
-        {isSection1 && (
-           <Button onClick={handleAnalyze} disabled={loading} size="sm" variant="outline" className="border-purple-500/80 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300">
-             {loading ? "Analyzing..." : "Analyze"}
-           </Button>
-        )}
+        <Button onClick={handleAnalyze} disabled={loading} size="sm" variant="outline" className="border-purple-500/80 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300">
+          {loading ? "Analyzing..." : "Analyze"}
+        </Button>
       </CardHeader>
       <CardContent>
         {initialState ? (
             <p className="text-sm text-muted-foreground">
-              {isSection1 ? "Click 'Analyze' to generate AI-powered insights comparing your selected start and end months." : (data.insights || "Data not available.")}
+              Click 'Analyze' to generate AI-powered insights comparing your selected start and end months.
             </p>
         ) : loading ? (
           <div className="space-y-2">
@@ -359,7 +356,7 @@ const BreakdownPopup = ({
 
 
 
-const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; isSection1?: boolean; }) => {
+const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
     const [filters, setFilters] = useState({ startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
     const [isPopupOpen, setPopupOpen] = useState(false);
@@ -553,7 +550,6 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
                         </CardContent>
                     </Card>
                     <AiInsightSection 
-                        isSection1={isSection1}
                         data={{ filters, startMonthTotals, endMonthTotals, insights }}
                     />
                 </div>
@@ -584,14 +580,10 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Section title="Section 1" sheetData={sheetData} detailsData={detailsData} isSection1={true} />
+                    <Section title="Section 1" sheetData={sheetData} detailsData={detailsData} />
                     <Section title="Section 2" sheetData={sheetData} detailsData={detailsData} />
                 </div>
             </CardContent>
         </Card>
     );
 }
-
-    
-
-    

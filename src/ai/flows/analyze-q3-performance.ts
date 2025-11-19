@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -27,9 +28,9 @@ const AnalyzeQ3PerformanceInputSchema = z.object({
 export type AnalyzeQ3PerformanceInput = z.infer<typeof AnalyzeQ3PerformanceInputSchema>;
 
 const AnalyzeQ3PerformanceOutputSchema = z.object({
-  summary: z.string().describe('A summary of the performance comparison, including key trends and significant changes.'),
-  insights: z.string().describe('Detailed insights on performance drivers, causality, and areas for improvement.'),
-  recommendations: z.string().optional().describe('Specific, actionable recommendations for optimizing performance based on the analysis.'),
+  summary: z.string().describe('A brief, one-sentence summary of the file count change.'),
+  insights: z.string().describe('2-3 bullet points identifying the most likely reasons for the change.'),
+  recommendations: z.string().optional().describe('1-2 actionable recommendations in bullet points.'),
 });
 export type AnalyzeQ3PerformanceOutput = z.infer<typeof AnalyzeQ3PerformanceOutputSchema>;
 
@@ -41,34 +42,20 @@ const prompt = ai.definePrompt({
   name: 'analyzeQ3PerformancePrompt',
   input: {schema: AnalyzeQ3PerformanceInputSchema},
   output: {schema: AnalyzeQ3PerformanceOutputSchema},
-  prompt: `You are an expert performance analyst specializing in content operations.
+  prompt: `You are an expert performance analyst. Compare the file count between two months and provide a concise, 3-4 point summary.
 
-You will analyze and compare the provided performance data for two months to identify key trends, significant changes, and areas for improvement.
-
-The user has filtered the data by:
-{{#if teamAndProduct}}
+User has filtered by:
 - Team [Product]: {{{teamAndProduct}}}
-{{/if}}
-{{#if materialVertical}}
 - Material Vertical: {{{materialVertical}}}
-{{/if}}
 
-Compare the following data:
+Data:
+- {{{startMonthData.month}}}: {{{startMonthData.fileCount}}} files | Budget: {{{startMonthData.budget}}} | Payment: {{{startMonthData.payment}}}
+- {{{endMonthData.month}}}: {{{endMonthData.fileCount}}} files | Budget: {{{endMonthData.budget}}} | Payment: {{{endMonthData.payment}}}
 
-Start Month ({{{startMonthData.month}}}):
-- File Count: {{{startMonthData.fileCount}}}
-- Budget: {{{startMonthData.budget}}}
-- Payment: {{{startMonthData.payment}}}
-
-End Month ({{{endMonthData.month}}}):
-- File Count: {{{endMonthData.fileCount}}}
-- Budget: {{{endMonthData.budget}}}
-- Payment: {{{endMonthData.payment}}}
-
-Based on the comparison, provide:
-1.  **Summary**: A brief summary of the changes in file count between the two months.
-2.  **Insights**: Analyze the data to provide possible causes for any increase or decrease. Consider factors like team performance, operational changes, or new initiatives that might have influenced the numbers.
-3.  **Recommendations**: Offer actionable advice based on your analysis. Suggest strategies to improve performance or sustain growth.
+Provide the following, keeping each section very brief:
+1.  **Summary**: A single sentence stating if file count increased, decreased, or stayed the same, and by how much.
+2.  **Insights**: 2-3 bullet points on the *most likely* causes. Be specific. (e.g., "Shift in focus to 'Daily Quiz' material, which has a higher volume," or "Reduced output in 'Lecture Slides' impacted the total.")
+3.  **Recommendations**: 1-2 actionable bullet points. (e.g., "Allocate more resources to 'Daily Quiz' to sustain growth," or "Investigate 'Lecture Slide' workflow for bottlenecks.")
 `,
 });
 
