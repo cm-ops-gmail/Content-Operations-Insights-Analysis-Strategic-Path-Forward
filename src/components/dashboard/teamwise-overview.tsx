@@ -20,6 +20,11 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { analyzePerformanceAction } from "@/app/actions/analyze";
+import type { AnalyzeQ3PerformanceOutput } from "@/ai/flows/analyze-q3-performance";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle } from 'lucide-react';
 
 
 const teamMap: Record<string, string> = {
@@ -135,7 +140,100 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
   </div>
 );
 
-const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][] }) => {
+const AiInsightSection = ({ data, isSection1 }: { data: any, isSection1: boolean }) => {
+  const [analysis, setAnalysis] = useState<AnalyzeQ3PerformanceOutput | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [initialState, setInitialState] = useState(true);
+
+  const handleAnalyze = async () => {
+    if (!isSection1) return;
+    setLoading(true);
+    setError(null);
+    setInitialState(false);
+    try {
+      const result = await analyzePerformanceAction({
+        startMonthData: {
+          month: data.filters.startMonth,
+          fileCount: data.startMonthTotals.fileCount,
+          budget: data.startMonthTotals.budget,
+          payment: data.startMonthTotals.payment,
+        },
+        endMonthData: {
+          month: data.filters.endMonth,
+          fileCount: data.endMonthTotals.fileCount,
+          budget: data.endMonthTotals.budget,
+          payment: data.endMonthTotals.payment,
+        },
+        teamAndProduct: data.filters.teamAndProduct,
+        materialVertical: data.filters.materialVertical,
+      });
+      setAnalysis(result);
+    } catch (e: any) {
+      setError(e.message || "An error occurred during analysis.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="bg-slate-900/60 border-purple-500/50">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Wand2 className="h-5 w-5 text-purple-400" />
+          <CardTitle className="text-base font-bold text-purple-400">
+            Insights
+          </CardTitle>
+        </div>
+        {isSection1 && (
+           <Button onClick={handleAnalyze} disabled={loading} size="sm" variant="outline" className="border-purple-500/80 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300">
+             {loading ? "Analyzing..." : "Analyze"}
+           </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        {initialState ? (
+            <p className="text-sm text-muted-foreground">
+              {isSection1 ? "Click 'Analyze' to generate AI-powered insights comparing your selected start and end months." : (data.insights || "Data not available.")}
+            </p>
+        ) : loading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ) : error ? (
+          <div className="text-sm text-red-400 flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
+            <p>Error: {error}</p>
+          </div>
+        ) : analysis ? (
+          <div className="space-y-4 text-sm">
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">Summary</h4>
+              <p className="text-muted-foreground">{analysis.summary}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-foreground mb-1">Analysis</h4>
+              <p className="text-muted-foreground">{analysis.insights}</p>
+            </div>
+            {analysis.recommendations && (
+              <div>
+                <h4 className="font-semibold text-foreground mb-1">Recommendations</h4>
+                <p className="text-muted-foreground">{analysis.recommendations}</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No insights generated.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+
+const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; isSection1?: boolean; }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
     const [filters, setFilters] = useState({ startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
 
@@ -144,9 +242,9 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
     const currentTeamSheetName = teamMap[selectedTeam];
     const currentTeamData = sheetData[currentTeamSheetName] || [];
 
-    const { fileCount, budget, payment, highlights, lowlights, insights } = useMemo(() => {
+    const { fileCount, budget, payment, highlights, lowlights, insights, startMonthTotals, endMonthTotals } = useMemo(() => {
       if (currentTeamData.length < 2) {
-          return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '' };
+          return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '', startMonthTotals: {}, endMonthTotals: {} };
       }
   
       const headerRow = currentTeamData[0].map(h => String(h).trim().toLowerCase());
@@ -164,56 +262,73 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
       const lowlightsIndex = getIndex('lowlights');
       const insightsIndex = getIndex('strategic path forward');
 
-      const { startMonth, endMonth, teamAndProduct, materialVertical } = filters;
+      const { teamAndProduct, materialVertical } = filters;
 
+      // Pre-filter by team and vertical first
+      let preFilteredRows = dataRows;
       if (teamAndProduct && teamAndProductIndex !== -1) {
-        dataRows = dataRows.filter(row => String(row[teamAndProductIndex]).trim().toLowerCase() === teamAndProduct.toLowerCase());
+        preFilteredRows = preFilteredRows.filter(row => String(row[teamAndProductIndex]).trim().toLowerCase() === teamAndProduct.toLowerCase());
       }
       if (materialVertical && materialVerticalIndex !== -1) {
-        dataRows = dataRows.filter(row => String(row[materialVerticalIndex]).trim().toLowerCase() === materialVertical.toLowerCase());
+        preFilteredRows = preFilteredRows.filter(row => String(row[materialVerticalIndex]).trim().toLowerCase() === materialVertical.toLowerCase());
+      }
+      
+      const calculateTotals = (rows: any[][]) => {
+        const sumColumn = (index: number, isCurrency: boolean = false) => {
+            if (index === -1) return 0;
+            return rows.reduce((sum, row) => {
+                if(row.length <= index) return sum;
+                const cellValue = row[index];
+                if (isCurrency) {
+                    return sum + (parseFloat(String(cellValue).replace(/[^0-9.-]+/g, "")) || 0);
+                }
+                return sum + (parseInt(String(cellValue).replace(/,/g, ''), 10) || 0);
+            }, 0);
+        };
+        const getColumnText = (index: number): string[] => {
+          if (index === -1) return [];
+          return rows.map(row => row.length > index ? String(row[index]).trim() : null).filter(Boolean).join('\n').split('\n').filter(Boolean);
+        };
+
+        const fileCountValue = sumColumn(fileCountIndex);
+        const budgetValue = sumColumn(budgetIndex, true);
+        const paymentValue = sumColumn(paymentIndex, true);
+
+        return {
+            fileCount: fileCountValue.toLocaleString(),
+            budget: `$${budgetValue.toLocaleString()}`,
+            payment: `$${paymentValue.toLocaleString()}`,
+            highlights: getColumnText(highlightsIndex),
+            lowlights: getColumnText(lowlightsIndex),
+            insights: getColumnText(insightsIndex).join(' '),
+        }
       }
 
+      // Filter for the overall range
+      const { startMonth, endMonth } = filters;
+      let rangedFilteredRows = preFilteredRows;
       if (startMonth && endMonth && monthIndex !== -1) {
           const startIndex = monthOptions.indexOf(startMonth);
           const endIndex = monthOptions.indexOf(endMonth);
 
           if (startIndex !== -1 && endIndex !== -1 && startIndex <= endIndex) {
               const validMonths = monthOptions.slice(startIndex, endIndex + 1).map(m => m.toLowerCase());
-              dataRows = dataRows.filter(row => {
+              rangedFilteredRows = rangedFilteredRows.filter(row => {
                   const rowMonth = String(row[monthIndex]).trim().toLowerCase();
                   return validMonths.includes(rowMonth);
               });
           }
       }
-  
-      const sumColumn = (index: number, isCurrency: boolean = false) => {
-          if (index === -1) return 0;
-          return dataRows.reduce((sum, row) => {
-              if(row.length <= index) return sum;
-              const cellValue = row[index];
-              if (isCurrency) {
-                  return sum + (parseFloat(String(cellValue).replace(/[^0-9.-]+/g, "")) || 0);
-              }
-              return sum + (parseInt(String(cellValue).replace(/,/g, ''), 10) || 0);
-          }, 0);
-      };
       
-      const fileCountValue = sumColumn(fileCountIndex);
-      const budgetValue = sumColumn(budgetIndex, true);
-      const paymentValue = sumColumn(paymentIndex, true);
+      const overallTotals = calculateTotals(rangedFilteredRows);
       
-      const getColumnText = (index: number): string[] => {
-          if (index === -1) return [];
-          return dataRows.map(row => row.length > index ? String(row[index]).trim() : null).filter(Boolean).join('\n').split('\n').filter(Boolean);
-      };
+      const startMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === startMonth.toLowerCase());
+      const endMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === endMonth.toLowerCase());
 
       return {
-          fileCount: fileCountValue.toLocaleString(),
-          budget: `$${budgetValue.toLocaleString()}`,
-          payment: `$${paymentValue.toLocaleString()}`,
-          highlights: getColumnText(highlightsIndex),
-          lowlights: getColumnText(lowlightsIndex),
-          insights: getColumnText(insightsIndex).join(' '),
+          ...overallTotals,
+          startMonthTotals: calculateTotals(startMonthRows),
+          endMonthTotals: calculateTotals(endMonthRows),
       };
 
   }, [currentTeamData, filters]);
@@ -276,22 +391,10 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                             </ul>
                         </CardContent>
                     </Card>
-                    <Card className="bg-slate-900/60 border-purple-500/50">
-                        <CardHeader>
-                           <CardTitle className="flex items-center gap-2 text-base font-bold text-purple-400">
-                             <Wand2 className="h-5 w-5" />
-                             Insights
-                           </CardTitle>
-                           <CardDescription className="text-xs text-purple-400/80 pt-1">
-                            Key insights and takeaways for the selected period.
-                           </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-muted-foreground">
-                                {insights || 'Data not available.'}
-                            </p>
-                        </CardContent>
-                    </Card>
+                    <AiInsightSection 
+                        isSection1={isSection1}
+                        data={{ filters, startMonthTotals, endMonthTotals, insights }}
+                    />
                 </div>
             </CardContent>
         </Card>
@@ -312,7 +415,7 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Section title="Section 1" sheetData={sheetData} detailsData={detailsData} />
+                    <Section title="Section 1" sheetData={sheetData} detailsData={detailsData} isSection1={true} />
                     <Section title="Section 2" sheetData={sheetData} detailsData={detailsData} />
                 </div>
             </CardContent>
