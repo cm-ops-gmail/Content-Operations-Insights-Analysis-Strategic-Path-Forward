@@ -50,6 +50,29 @@ const teamAndProductOptions = [
   "Skills & English",
 ];
 
+const materialVerticalOptionsList = [
+    "Course Listing",
+    "PDP Update",
+    "IELTS Mock Test Listing",
+    "Homework Listing / Assign",
+    "Lecture Slide",
+    "Lecture Sheet",
+    "Daily Quiz",
+    "Weekly Quiz",
+    "Weekly CQ",
+    "Monthly Quiz",
+    "Monthly CQ",
+    "Model Test Quiz",
+    "Model Test CQ",
+    "LIVE Class Listing / Upload",
+    "Record Shoot Listing / Upload",
+    "Monthly Quiz Written",
+    "Workbook",
+    "Math Excercise Solve",
+    "Book",
+    "Practice Sheet"
+];
+
 const chartConfig = {
   month1: { label: "Month 1", color: "hsl(var(--chart-1))" },
   month2: { label: "Month 2", color: "hsl(var(--chart-2))" },
@@ -199,14 +222,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
     const [filters, setFilters] = useState({ month: '', teamAndProduct: '', materialVertical: '' });
 
-    const materialVerticalOptions = useMemo(() => {
-        if (!detailsData || detailsData.length <= 1) return [];
-        const header = detailsData[0].map(h => String(h).trim().toLowerCase());
-        const columnIndex = header.findIndex(h => h === 'material vertical');
-        if (columnIndex === -1) return [];
-        const options = detailsData.slice(1).map(row => row[columnIndex]).filter(Boolean);
-        return [...new Set(options)];
-    }, [detailsData]);
+    const materialVerticalOptions = materialVerticalOptionsList;
 
     const currentTeamSheetName = teamMap[selectedTeam];
     const currentTeamData = sheetData[currentTeamSheetName] || [];
@@ -219,10 +235,11 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
       const headerRow = currentTeamData[0].map(h => String(h).trim().toLowerCase());
       let dataRows = currentTeamData.slice(1);
   
-      const getIndex = (name: string) => headerRow.findIndex(h => h === name.toLowerCase());
+      const getIndex = (name: string) => headerRow.findIndex(h => h === name.toLowerCase().trim());
   
       const monthIndex = getIndex('month');
       const teamAndProductIndex = getIndex('team [product]');
+      const materialVerticalIndex = getIndex('material vertical');
       const fileCountIndex = getIndex('file count');
       const budgetIndex = getIndex('budget');
       const paymentIndex = getIndex('payment [paid]');
@@ -235,7 +252,10 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
         dataRows = dataRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === filters.month.toLowerCase());
       }
       if (filters.teamAndProduct && teamAndProductIndex !== -1) {
-        dataRows = dataRows.filter(row => String(row[teamAndProductIndex]).trim() === filters.teamAndProduct);
+        dataRows = dataRows.filter(row => String(row[teamAndProductIndex]).trim().toLowerCase() === filters.teamAndProduct.toLowerCase());
+      }
+      if (filters.materialVertical && materialVerticalIndex !== -1) {
+        dataRows = dataRows.filter(row => String(row[materialVerticalIndex]).trim().toLowerCase() === filters.materialVertical.toLowerCase());
       }
   
       const sumColumn = (index: number, isCurrency: boolean = false) => {
