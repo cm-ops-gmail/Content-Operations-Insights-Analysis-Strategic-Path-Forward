@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Bar, BarChart, XAxis, YAxis, LabelList } from "recharts";
 import { Wand2 } from "lucide-react"
 
 import {
@@ -20,12 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartConfig,
-} from "@/components/ui/chart";
 import { Label } from "@/components/ui/label";
 
 
@@ -144,7 +137,7 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
 
 const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][] }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
-    const [filters, setFilters] = useState({ startMonth: '', endMonth: '', teamAndProduct: '', materialVertical: '' });
+    const [filters, setFilters] = useState({ startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
 
     const materialVerticalOptions = materialVerticalOptionsList;
 
@@ -171,7 +164,6 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
       const lowlightsIndex = getIndex('lowlights');
       const insightsIndex = getIndex('strategic path forward');
 
-      // Filter rows based on dropdown selections
       const { startMonth, endMonth, teamAndProduct, materialVertical } = filters;
 
       if (teamAndProduct && teamAndProductIndex !== -1) {
@@ -181,7 +173,6 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
         dataRows = dataRows.filter(row => String(row[materialVerticalIndex]).trim().toLowerCase() === materialVertical.toLowerCase());
       }
 
-      // Date range filtering
       if (startMonth && endMonth && monthIndex !== -1) {
           const startIndex = monthOptions.indexOf(startMonth);
           const endIndex = monthOptions.indexOf(endMonth);
@@ -193,12 +184,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                   return validMonths.includes(rowMonth);
               });
           }
-      } else if (startMonth && monthIndex !== -1) {
-            dataRows = dataRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === startMonth.toLowerCase());
-      } else if (endMonth && monthIndex !== -1) {
-            dataRows = dataRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === endMonth.toLowerCase());
       }
-
   
       const sumColumn = (index: number, isCurrency: boolean = false) => {
           if (index === -1) return 0;
@@ -218,7 +204,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
       
       const getColumnText = (index: number): string[] => {
           if (index === -1) return [];
-          return dataRows.map(row => row.length > index ? row[index] : null).filter(Boolean).join('\n').split('\n').filter(Boolean);
+          return dataRows.map(row => row.length > index ? String(row[index]).trim() : null).filter(Boolean).join('\n').split('\n').filter(Boolean);
       };
 
       return {
@@ -294,10 +280,10 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                         <CardHeader>
                            <CardTitle className="flex items-center gap-2 text-base font-bold text-purple-400">
                              <Wand2 className="h-5 w-5" />
-                             Strategic Insights
+                             Insights
                            </CardTitle>
                            <CardDescription className="text-xs text-purple-400/80 pt-1">
-                            Key strategic initiatives and recommendations by team, for the selected month.
+                            Key insights and takeaways for the selected period.
                            </CardDescription>
                         </CardHeader>
                         <CardContent>
