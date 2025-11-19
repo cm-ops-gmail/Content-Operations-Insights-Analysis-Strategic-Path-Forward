@@ -52,8 +52,7 @@ const teamMap: Record<string, string> = {
 const teams = Object.keys(teamMap);
 
 const monthOptions = [
-    "January", "February", "March", "April", "May", "June", 
-    "July", "August", "September", "October", "November", "December"
+    "July", "August", "September"
 ];
 
 
@@ -123,7 +122,7 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
       </Select>
     </div>
     <div className="space-y-2">
-      <Label htmlFor="team-product" className="text-xs text-muted-foreground">Select the Team</Label>
+      <Label htmlFor="team-product" className="text-xs text-muted-foreground">Team [Product]</Label>
       <Select value={filters.teamAndProduct} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, teamAndProduct: value }))}>
         <SelectTrigger id="team-product" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
           <SelectValue placeholder="Team [Product]" />
@@ -273,9 +272,9 @@ const BreakdownPopup = ({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="p-2 bg-slate-800 text-white rounded-md border border-slate-700">
-          <p className="label">{`${label}`}</p>
-          <p className="intro">{`Efficiency : ${payload[0].value.toFixed(1)}%`}</p>
+        <div className="p-2 bg-slate-800 text-white rounded-md border border-slate-700 shadow-lg">
+          <p className="label font-bold">{`${label}`}</p>
+          <p className="intro text-sm">{`Efficiency : ${payload[0].value.toFixed(1)}%`}</p>
         </div>
       );
     }
@@ -303,19 +302,19 @@ const BreakdownPopup = ({
                 <TableHeader>
                   <TableRow className="hover:bg-slate-800">
                     <TableHead className="text-cyan-400">Material Vertical</TableHead>
-                    <TableHead className="text-cyan-400">{startMonth}</TableHead>
-                    <TableHead className="text-cyan-400">{endMonth}</TableHead>
-                    <TableHead className="text-cyan-400">Efficiency (MoM %)</TableHead>
+                    <TableHead className="text-cyan-400 text-center">{startMonth}</TableHead>
+                    <TableHead className="text-cyan-400 text-center">{endMonth}</TableHead>
+                    <TableHead className="text-cyan-400 text-center">Efficiency (MoM %)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {breakdownData.length > 0 ? breakdownData.map((item, index) => (
                     <TableRow key={index} className="hover:bg-slate-800/50">
                       <TableCell className="font-medium text-muted-foreground text-xs">{item.materialVertical}</TableCell>
-                      <TableCell className="text-foreground">{item.startMonthCount}</TableCell>
-                      <TableCell className="text-foreground">{item.endMonthCount}</TableCell>
-                      <TableCell className={item.efficiency >= 0 ? "text-green-400" : "text-red-400"}>
-                        <div className="flex items-center gap-1">
+                      <TableCell className="text-foreground text-center">{item.startMonthCount}</TableCell>
+                      <TableCell className="text-foreground text-center">{item.endMonthCount}</TableCell>
+                      <TableCell className={`text-center font-bold ${item.efficiency >= 0 ? "text-green-400" : "text-red-400"}`}>
+                        <div className="flex items-center justify-center gap-1">
                             {item.efficiency >= 0 ? <TrendingUp size={14}/> : <TrendingDown size={14}/>}
                             {item.efficiency.toFixed(1)}%
                         </div>
@@ -335,11 +334,11 @@ const BreakdownPopup = ({
             <div className="flex-grow border border-cyan-500/30 rounded-lg p-4">
                 {breakdownData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 50, bottom: 5 }}>
-                            <XAxis type="number" stroke="#94a3b8" tickFormatter={(tick) => `${tick}%`}/>
-                            <YAxis type="category" dataKey="name" stroke="#94a3b8" width={150} tick={{ fontSize: 10 }}/>
+                        <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 50, left: 50, bottom: 5 }}>
+                            <XAxis type="number" stroke="#94a3b8" tickFormatter={(tick) => `${tick}%`} domain={['auto', 'auto']} />
+                            <YAxis type="category" dataKey="name" stroke="#94a3b8" width={150} tick={{ fontSize: 10 }} interval={0}/>
                             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(71, 85, 105, 0.3)' }}/>
-                            <Bar dataKey="efficiency">
+                            <Bar dataKey="efficiency" radius={[0, 4, 4, 0]}>
                                 {chartData.map((entry, index) => (
                                     <Bar key={`cell-${index}`} fill={getBarColor(entry.efficiency)} />
                                 ))}
@@ -592,3 +591,5 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
