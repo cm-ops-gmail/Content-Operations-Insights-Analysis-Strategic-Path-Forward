@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Wand2 } from "lucide-react"
+import { Wand2, AlertCircle, TrendingUp, TrendingDown } from "lucide-react"
 
 import {
   Card,
@@ -18,13 +18,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { analyzePerformanceAction } from "@/app/actions/analyze";
 import type { AnalyzeQ3PerformanceOutput } from "@/ai/flows/analyze-q3-performance";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 
 
 const teamMap: Record<string, string> = {
@@ -233,18 +248,125 @@ const AiInsightSection = ({ data, isSection1 }: { data: any, isSection1: boolean
 };
 
 
+const BreakdownPopup = ({
+  isOpen,
+  onClose,
+  teamName,
+  breakdownData,
+  startMonth,
+  endMonth
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  teamName: string;
+  breakdownData: any[];
+  startMonth: string;
+  endMonth: string;
+}) => {
+  if (!isOpen) return null;
+
+  const chartData = breakdownData.map(item => ({
+    name: item.materialVertical,
+    efficiency: item.efficiency
+  }));
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="p-2 bg-slate-800 text-white rounded-md border border-slate-700">
+          <p className="label">{`${label}`}</p>
+          <p className="intro">{`Efficiency : ${payload[0].value.toFixed(1)}%`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-6xl h-[80vh] bg-slate-900/90 border-cyan-500/50 backdrop-blur-sm">
+        <DialogHeader>
+          <DialogTitle className="text-cyan-400 text-xl">Detailed Breakdown for {teamName}</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full py-4">
+          <div className="flex flex-col h-full">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Raw Data Table</h3>
+            <div className="flex-grow overflow-auto border border-cyan-500/30 rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-slate-800">
+                    <TableHead className="text-cyan-400">Material Vertical</TableHead>
+                    <TableHead className="text-cyan-400">{startMonth}</TableHead>
+                    <TableHead className="text-cyan-400">{endMonth}</TableHead>
+                    <TableHead className="text-cyan-400">Efficiency (MoM %)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {breakdownData.length > 0 ? breakdownData.map((item, index) => (
+                    <TableRow key={index} className="hover:bg-slate-800/50">
+                      <TableCell className="font-medium text-muted-foreground text-xs">{item.materialVertical}</TableCell>
+                      <TableCell className="text-foreground">{item.startMonthCount}</TableCell>
+                      <TableCell className="text-foreground">{item.endMonthCount}</TableCell>
+                      <TableCell className={item.efficiency >= 0 ? "text-green-400" : "text-red-400"}>
+                        <div className="flex items-center gap-1">
+                            {item.efficiency >= 0 ? <TrendingUp size={14}/> : <TrendingDown size={14}/>}
+                            {item.efficiency.toFixed(1)}%
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-muted-foreground">Data not available.</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+          <div className="flex flex-col h-full">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Efficiency Chart</h3>
+            <div className="flex-grow border border-cyan-500/30 rounded-lg p-4">
+                {breakdownData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 50, bottom: 5 }}>
+                            <XAxis type="number" stroke="#94a3b8" tickFormatter={(tick) => `${tick}%`}/>
+                            <YAxis type="category" dataKey="name" stroke="#94a3b8" width={150} tick={{ fontSize: 10 }}/>
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(71, 85, 105, 0.3)' }}/>
+                            <Bar dataKey="efficiency">
+                                {chartData.map((entry, index) => (
+                                    <Bar key={`cell-${index}`} fill={entry.efficiency >= 0 ? 'hsl(var(--chart-4))' : 'hsl(var(--destructive))'} />
+                                ))}
+                                <LabelList dataKey="efficiency" position="right" formatter={(value: number) => `${value.toFixed(1)}%`} fontSize={10} fill="white" />
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div className="flex items-center justify-center h-full text-muted-foreground">Chart not available.</div>
+                )}
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+
+
 const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; isSection1?: boolean; }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
     const [filters, setFilters] = useState({ startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
+    const [isPopupOpen, setPopupOpen] = useState(false);
 
     const materialVerticalOptions = materialVerticalOptionsList;
 
     const currentTeamSheetName = teamMap[selectedTeam];
     const currentTeamData = sheetData[currentTeamSheetName] || [];
 
-    const { fileCount, budget, payment, highlights, lowlights, insights, startMonthTotals, endMonthTotals } = useMemo(() => {
+    const { fileCount, budget, payment, highlights, lowlights, insights, startMonthTotals, endMonthTotals, breakdownData } = useMemo(() => {
       if (currentTeamData.length < 2) {
-          return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '', startMonthTotals: {}, endMonthTotals: {} };
+          return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '', startMonthTotals: {}, endMonthTotals: {}, breakdownData: [] };
       }
   
       const headerRow = currentTeamData[0].map(h => String(h).trim().toLowerCase());
@@ -264,7 +386,6 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
 
       const { teamAndProduct, materialVertical } = filters;
 
-      // Pre-filter by team and vertical first
       let preFilteredRows = dataRows;
       if (teamAndProduct && teamAndProductIndex !== -1) {
         preFilteredRows = preFilteredRows.filter(row => String(row[teamAndProductIndex]).trim().toLowerCase() === teamAndProduct.toLowerCase());
@@ -287,7 +408,7 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
         };
         const getColumnText = (index: number): string[] => {
           if (index === -1) return [];
-          return rows.map(row => row.length > index ? String(row[index]).trim() : null).filter(Boolean).join('\n').split('\n').filter(Boolean);
+          return Array.from(new Set(rows.map(row => row.length > index ? String(row[index]).trim() : null).filter(Boolean).join('\n').split('\n').filter(Boolean)));
         };
 
         const fileCountValue = sumColumn(fileCountIndex);
@@ -304,7 +425,6 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
         }
       }
 
-      // Filter for the overall range
       const { startMonth, endMonth } = filters;
       let rangedFilteredRows = preFilteredRows;
       if (startMonth && endMonth && monthIndex !== -1) {
@@ -325,10 +445,38 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
       const startMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === startMonth.toLowerCase());
       const endMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === endMonth.toLowerCase());
 
+      const verticals = Array.from(new Set(preFilteredRows.map(row => row[materialVerticalIndex]).filter(Boolean)));
+
+      const breakdown = verticals.map(vertical => {
+          const startRows = startMonthRows.filter(row => row[materialVerticalIndex] === vertical);
+          const endRows = endMonthRows.filter(row => row[materialVerticalIndex] === vertical);
+
+          const startCount = calculateTotals(startRows).fileCount.replace(/,/g, '');
+          const endCount = calculateTotals(endRows).fileCount.replace(/,/g, '');
+
+          const startNum = parseInt(startCount, 10) || 0;
+          const endNum = parseInt(endCount, 10) || 0;
+
+          let efficiency = 0;
+          if (startNum > 0) {
+              efficiency = ((endNum - startNum) / startNum) * 100;
+          } else if (endNum > 0) {
+              efficiency = 100;
+          }
+
+          return {
+              materialVertical: vertical,
+              startMonthCount: startNum,
+              endMonthCount: endNum,
+              efficiency: efficiency,
+          };
+      });
+
       return {
           ...overallTotals,
           startMonthTotals: calculateTotals(startMonthRows),
           endMonthTotals: calculateTotals(endMonthRows),
+          breakdownData: breakdown,
       };
 
   }, [currentTeamData, filters]);
@@ -365,7 +513,17 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
                     <Scoreboard title="Budget" value={budget} />
                     <Scoreboard title="Payment" value={payment} />
                 </div>
+                
+                {!isSection1 && (
+                    <div className="mt-2">
+                        <Button onClick={() => setPopupOpen(true)} className="w-full" variant="outline">
+                            View Breakdown
+                        </Button>
+                    </div>
+                )}
+                
                 <Separator className="bg-cyan-500/30 my-4" />
+
                 <div className="space-y-4">
                     <Card className="bg-slate-900/60 border-green-500/50">
                         <CardHeader>
@@ -397,6 +555,16 @@ const Section = ({ title, sheetData, detailsData, isSection1 = false }: { title:
                     />
                 </div>
             </CardContent>
+            {!isSection1 && (
+                <BreakdownPopup 
+                    isOpen={isPopupOpen}
+                    onClose={() => setPopupOpen(false)}
+                    teamName={selectedTeam}
+                    breakdownData={breakdownData}
+                    startMonth={filters.startMonth}
+                    endMonth={filters.endMonth}
+                />
+            )}
         </Card>
     );
 }
