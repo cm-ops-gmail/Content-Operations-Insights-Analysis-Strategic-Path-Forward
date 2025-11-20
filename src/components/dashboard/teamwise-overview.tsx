@@ -154,7 +154,7 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
   </div>
 );
 
-const AiInsightSection = ({ data }: { data: any }) => {
+const AiInsightSection = ({ data, sectionId }: { data: any, sectionId: string }) => {
   const [analysis, setAnalysis] = useState<AnalyzeQ3PerformanceOutput | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -356,7 +356,7 @@ const BreakdownPopup = ({
 
 
 
-const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; }) => {
+const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; sectionId: string; }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
     const [filters, setFilters] = useState({ startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
     const [isPopupOpen, setPopupOpen] = useState(false);
@@ -550,6 +550,7 @@ const Section = ({ title, sheetData, detailsData }: { title: string; sheetData: 
                         </CardContent>
                     </Card>
                     <AiInsightSection 
+                        sectionId={sectionId}
                         data={{ filters, startMonthTotals, endMonthTotals, insights }}
                     />
                 </div>
@@ -580,10 +581,12 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Section title="Section 1" sheetData={sheetData} detailsData={detailsData} />
-                    <Section title="Section 2" sheetData={sheetData} detailsData={detailsData} />
+                    <Section title="Section 1" sectionId="section-1" sheetData={sheetData} detailsData={detailsData} />
+                    <Section title="Section 2" sectionId="section-2" sheetData={sheetData} detailsData={detailsData} />
                 </div>
             </CardContent>
         </Card>
     );
 }
+
+    
