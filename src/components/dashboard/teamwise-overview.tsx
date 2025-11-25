@@ -460,7 +460,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                 <div className="mt-2">
                     <Button 
                       onClick={() => setPopupOpen(true)} 
-                      className="w-full bg-background border-border text-foreground hover:bg-foreground hover:text-background dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:hover:bg-secondary">
+                      className="w-full bg-muted border-transparent text-foreground hover:bg-foreground hover:text-background dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:hover:bg-secondary">
                         View Breakdown
                     </Button>
                 </div>
@@ -530,6 +530,8 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
 
     
 
