@@ -458,7 +458,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                 </div>
                 
                 <div className="mt-2">
-                    <Button onClick={() => setPopupOpen(true)} className="w-full">
+                    <Button onClick={() => setPopupOpen(true)} className="w-full hover:bg-foreground hover:text-background dark:hover:bg-secondary">
                         View Breakdown
                     </Button>
                 </div>
