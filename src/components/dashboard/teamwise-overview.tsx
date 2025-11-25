@@ -52,7 +52,8 @@ const teamMap: Record<string, string> = {
 const teams = Object.keys(teamMap);
 
 const monthOptions = [
-    "July", "August", "September"
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
 ];
 
 
@@ -358,7 +359,7 @@ const BreakdownPopup = ({
 
 const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; sectionId: string; }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
-    const [filters, setFilters] = useState({ startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
+    const [filters, setFilters] = useState({ startMonth: 'January', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
     const [isPopupOpen, setPopupOpen] = useState(false);
 
     const materialVerticalOptions = materialVerticalOptionsList;
@@ -589,4 +590,5 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
     );
 }
 
+    
     
