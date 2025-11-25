@@ -438,7 +438,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                         </SelectTrigger>
                         <SelectContent className="border-cyan-500/80">
                             {teams.map((team) => (
-                                <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background hover:bg-muted">
+                                <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background hover:!bg-muted focus:!bg-muted">
                                     {team}
                                 </SelectItem>
                             ))}
@@ -537,3 +537,4 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
 
     
 
+    
