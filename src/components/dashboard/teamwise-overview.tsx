@@ -249,105 +249,47 @@ const BreakdownPopup = ({
   isOpen,
   onClose,
   teamName,
-  breakdownData,
-  startMonth,
-  endMonth
+  tableData,
+  tableHeader,
 }: {
   isOpen: boolean;
   onClose: () => void;
   teamName: string;
-  breakdownData: any[];
-  startMonth: string;
-  endMonth: string;
+  tableData: any[][];
+  tableHeader: string[];
 }) => {
   if (!isOpen) return null;
-
-  const chartData = breakdownData.map(item => ({
-    name: item.materialVertical,
-    efficiency: item.efficiency
-  }));
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="p-2 bg-slate-800 text-white rounded-md border border-slate-700 shadow-lg">
-          <p className="label font-bold">{`${label}`}</p>
-          <p className="intro text-sm">{`Efficiency : ${payload[0].value.toFixed(1)}%`}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  const getBarColor = (efficiency: number) => {
-    if (efficiency < 0) return 'hsl(var(--destructive))'; // Red
-    if (efficiency >= 100) return 'hsl(var(--chart-2))'; // Green
-    return 'hsl(var(--chart-4))'; // Yellow/Orange
-  };
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl h-[80vh] bg-slate-900/90 border-cyan-500/50 backdrop-blur-sm">
         <DialogHeader>
-          <DialogTitle className="text-cyan-400 text-xl">Detailed Breakdown for {teamName}</DialogTitle>
+          <DialogTitle className="text-cyan-400 text-xl">Sheet Data for {teamName}</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full py-4">
-          <div className="flex flex-col h-full">
-            <h3 className="text-lg font-semibold text-foreground mb-2">Raw Data Table</h3>
-            <div className="flex-grow overflow-auto border border-cyan-500/30 rounded-lg">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-slate-800">
-                    <TableHead className="text-cyan-400">Material Vertical</TableHead>
-                    <TableHead className="text-cyan-400 text-center">{startMonth}</TableHead>
-                    <TableHead className="text-cyan-400 text-center">{endMonth}</TableHead>
-                    <TableHead className="text-cyan-400 text-center">Efficiency (MoM %)</TableHead>
+        <div className="flex flex-col h-full py-4">
+          <div className="flex-grow overflow-auto border border-cyan-500/30 rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-slate-800">
+                  {tableHeader.map((header, index) => (
+                    <TableHead key={index} className="text-cyan-400 whitespace-nowrap">{header}</TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tableData.length > 0 ? tableData.map((row, rowIndex) => (
+                  <TableRow key={rowIndex} className="hover:bg-slate-800/50">
+                    {row.map((cell, cellIndex) => (
+                      <TableCell key={cellIndex} className="text-muted-foreground text-xs whitespace-nowrap">{cell}</TableCell>
+                    ))}
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {breakdownData.length > 0 ? breakdownData.map((item, index) => (
-                    <TableRow key={index} className="hover:bg-slate-800/50">
-                      <TableCell className="font-medium text-muted-foreground text-xs">{item.materialVertical}</TableCell>
-                      <TableCell className="text-foreground text-center">{item.startMonthCount}</TableCell>
-                      <TableCell className="text-foreground text-center">{item.endMonthCount}</TableCell>
-                      <TableCell className={`text-center font-bold ${item.efficiency >= 0 ? "text-green-400" : "text-red-400"}`}>
-                        <div className="flex items-center justify-center gap-1">
-                            {item.efficiency >= 0 ? <TrendingUp size={14}/> : <TrendingDown size={14}/>}
-                            {item.efficiency.toFixed(1)}%
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )) : (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center text-muted-foreground">Data not available.</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-          <div className="flex flex-col h-full">
-            <h3 className="text-lg font-bold text-cyan-400 mb-2">Efficiency Chart</h3>
-            <div className="flex-grow border border-cyan-500/30 rounded-lg p-4">
-                {breakdownData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 50, left: 50, bottom: 5 }}>
-                            <XAxis type="number" stroke="#94a3b8" tickFormatter={(tick) => `${tick}%`} domain={['auto', 'auto']} />
-                            <YAxis type="category" dataKey="name" stroke="#94a3b8" width={150} tick={{ fontSize: 10 }} interval={0}/>
-                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(71, 85, 105, 0.3)' }}/>
-                            <Bar dataKey="efficiency" radius={[0, 4, 4, 0]}>
-                                {chartData.map((entry, index) => (
-                                    <Bar key={`cell-${index}`} fill={getBarColor(entry.efficiency)} />
-                                ))}
-                                <LabelList dataKey="efficiency" position="right" formatter={(value: number) => `${value.toFixed(1)}%`} fontSize={10} fill="white" />
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                ) : (
-                    <div className="flex items-center justify-center h-full text-muted-foreground">Chart not available.</div>
+                )) : (
+                  <TableRow>
+                    <TableCell colSpan={tableHeader.length} className="text-center text-muted-foreground">Data not available for the selected period.</TableCell>
+                  </TableRow>
                 )}
-            </div>
+              </TableBody>
+            </Table>
           </div>
         </div>
       </DialogContent>
@@ -367,15 +309,15 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
     const currentTeamSheetName = teamMap[selectedTeam];
     const currentTeamData = sheetData[currentTeamSheetName] || [];
 
-    const { fileCount, budget, payment, highlights, lowlights, insights, startMonthTotals, endMonthTotals, breakdownData } = useMemo(() => {
+    const { fileCount, budget, payment, highlights, lowlights, insights, startMonthTotals, endMonthTotals, breakdownData, rawSheetHeader, rawSheetData } = useMemo(() => {
       if (currentTeamData.length < 2) {
-          return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '', startMonthTotals: {}, endMonthTotals: {}, breakdownData: [] };
+          return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '', startMonthTotals: {}, endMonthTotals: {}, breakdownData: [], rawSheetHeader: [], rawSheetData: [] };
       }
   
-      const headerRow = currentTeamData[0].map(h => String(h).trim().toLowerCase());
+      const headerRow = currentTeamData[0].map(h => String(h).trim());
       let dataRows = currentTeamData.slice(1);
   
-      const getIndex = (name: string) => headerRow.findIndex(h => h === name.toLowerCase().trim());
+      const getIndex = (name: string) => headerRow.findIndex(h => h.toLowerCase().trim() === name.toLowerCase().trim());
   
       const monthIndex = getIndex('month');
       const teamAndProductIndex = getIndex('team [product]');
@@ -397,7 +339,34 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
         preFilteredRows = preFilteredRows.filter(row => String(row[materialVerticalIndex]).trim().toLowerCase() === materialVertical.toLowerCase());
       }
       
+      const { startMonth, endMonth } = filters;
+      let rangedFilteredRows = preFilteredRows;
+      if (startMonth && endMonth && monthIndex !== -1) {
+          const startIndex = monthOptions.indexOf(startMonth);
+          const endIndex = monthOptions.indexOf(endMonth);
+
+          if (startIndex !== -1 && endIndex !== -1 && startIndex <= endIndex) {
+              const validMonths = monthOptions.slice(startIndex, endIndex + 1).map(m => m.toLowerCase());
+              rangedFilteredRows = rangedFilteredRows.filter(row => {
+                  if (row.length <= monthIndex) return false;
+                  const rowMonth = String(row[monthIndex]).trim().toLowerCase();
+                  return validMonths.includes(rowMonth);
+              });
+          }
+      }
+
       const calculateTotals = (rows: any[][]) => {
+        if (rows.length === 0) {
+            return {
+                fileCount: 'no file entry for this month',
+                budget: '$0',
+                payment: '$0',
+                highlights: [],
+                lowlights: [],
+                insights: ''
+            };
+        }
+
         const sumColumn = (index: number, isCurrency: boolean = false) => {
             if (index === -1) return 0;
             return rows.reduce((sum, row) => {
@@ -419,7 +388,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
         const paymentValue = sumColumn(paymentIndex, true);
 
         return {
-            fileCount: fileCountValue.toLocaleString(),
+            fileCount: fileCountValue > 0 ? fileCountValue.toLocaleString() : "0",
             budget: `$${budgetValue.toLocaleString()}`,
             payment: `$${paymentValue.toLocaleString()}`,
             highlights: getColumnText(highlightsIndex),
@@ -427,59 +396,19 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
             insights: getColumnText(insightsIndex).join(' '),
         }
       }
-
-      const { startMonth, endMonth } = filters;
-      let rangedFilteredRows = preFilteredRows;
-      if (startMonth && endMonth && monthIndex !== -1) {
-          const startIndex = monthOptions.indexOf(startMonth);
-          const endIndex = monthOptions.indexOf(endMonth);
-
-          if (startIndex !== -1 && endIndex !== -1 && startIndex <= endIndex) {
-              const validMonths = monthOptions.slice(startIndex, endIndex + 1).map(m => m.toLowerCase());
-              rangedFilteredRows = rangedFilteredRows.filter(row => {
-                  const rowMonth = String(row[monthIndex]).trim().toLowerCase();
-                  return validMonths.includes(rowMonth);
-              });
-          }
-      }
       
       const overallTotals = calculateTotals(rangedFilteredRows);
       
       const startMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === startMonth.toLowerCase());
       const endMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === endMonth.toLowerCase());
 
-      const verticals = Array.from(new Set(preFilteredRows.map(row => row[materialVerticalIndex]).filter(Boolean)));
-
-      const breakdown = verticals.map(vertical => {
-          const startRows = startMonthRows.filter(row => row[materialVerticalIndex] === vertical);
-          const endRows = endMonthRows.filter(row => row[materialVerticalIndex] === vertical);
-
-          const startCount = calculateTotals(startRows).fileCount.replace(/,/g, '');
-          const endCount = calculateTotals(endRows).fileCount.replace(/,/g, '');
-
-          const startNum = parseInt(startCount, 10) || 0;
-          const endNum = parseInt(endCount, 10) || 0;
-
-          let efficiency = 0;
-          if (startNum > 0) {
-              efficiency = ((endNum - startNum) / startNum) * 100;
-          } else if (endNum > 0) {
-              efficiency = 100;
-          }
-
-          return {
-              materialVertical: vertical,
-              startMonthCount: startNum,
-              endMonthCount: endNum,
-              efficiency: efficiency,
-          };
-      });
-
       return {
           ...overallTotals,
           startMonthTotals: calculateTotals(startMonthRows),
           endMonthTotals: calculateTotals(endMonthRows),
-          breakdownData: breakdown,
+          breakdownData: [],
+          rawSheetHeader: headerRow,
+          rawSheetData: rangedFilteredRows
       };
 
   }, [currentTeamData, filters]);
@@ -560,9 +489,8 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                 isOpen={isPopupOpen}
                 onClose={() => setPopupOpen(false)}
                 teamName={selectedTeam}
-                breakdownData={breakdownData}
-                startMonth={filters.startMonth}
-                endMonth={filters.endMonth}
+                tableData={rawSheetData}
+                tableHeader={rawSheetHeader}
             />
         </Card>
     );
@@ -589,6 +517,3 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
-
-    
-    
