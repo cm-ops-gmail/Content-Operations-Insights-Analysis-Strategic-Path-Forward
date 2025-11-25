@@ -514,7 +514,7 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
     return (
         <Card className="bg-card/50 border-cyan-500/50">
             <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
+                <div className="space-y-1.5">
                     <CardTitle className="text-cyan-400">Teamwise Overview</CardTitle>
                     <CardDescription>
                         Select a team in each section to view specific details.
