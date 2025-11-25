@@ -88,7 +88,7 @@ const materialVerticalOptionsList = [
 ];
 
 const Scoreboard = ({ title, value }: { title: string; value: string }) => (
-  <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30">
+  <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30 hover:border-cyan-400/80 transition-colors">
     <p className="text-sm text-muted-foreground">{title}</p>
     <p className="text-2xl font-bold text-foreground">{value}</p>
   </div>
@@ -513,7 +513,7 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
     const detailsData = sheetData['Details'] || [];
     return (
         <Card className="bg-card/50 border-border">
-            <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <CardHeader>
                 <div className="space-y-1.5">
                     <CardTitle className="text-cyan-400">Teamwise Overview</CardTitle>
                     <CardDescription>
@@ -530,6 +530,8 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
 
     
 
