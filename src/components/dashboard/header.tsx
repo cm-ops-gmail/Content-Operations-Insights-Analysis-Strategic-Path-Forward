@@ -2,7 +2,7 @@ import Alerts from './alerts';
 
 export default function DashboardHeader() {
   return (
-    <header className="bg-card/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
+    <header className="bg-card/50 backdrop-blur-lg shadow-sm sticky top-0 z-10">
       <div className="container mx-auto flex h-24 items-center justify-between px-4 md:px-6">
         <div className="w-28"></div> {/* Spacer to help with centering */}
         <div className="text-center">
