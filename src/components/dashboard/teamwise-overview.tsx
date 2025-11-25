@@ -433,7 +433,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
             <CardContent className="flex-1 flex flex-col gap-4">
                 <div className="w-full">
                     <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                        <SelectTrigger className="w-full focus:ring-cyan-500 border-0">
+                        <SelectTrigger className="w-full focus:ring-cyan-500">
                             <SelectValue placeholder="Select a team" />
                         </SelectTrigger>
                         <SelectContent className="border-cyan-500/80">
@@ -530,6 +530,8 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
 
     
 
