@@ -39,6 +39,7 @@ import { Button } from "@/components/ui/button";
 import { analyzePerformanceAction } from "@/app/actions/analyze";
 import type { AnalyzeQ3PerformanceOutput } from "@/ai/flows/analyze-q3-performance";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 const teamMap: Record<string, string> = {
@@ -261,25 +262,25 @@ const BreakdownPopup = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[80vh] bg-slate-900/90 border-cyan-500/50 backdrop-blur-sm">
+      <DialogContent className="max-w-4xl h-[80vh] bg-card border-border flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-cyan-400 text-xl">Sheet Data for {teamName}</DialogTitle>
+          <DialogTitle className="text-foreground text-xl">Sheet Data for {teamName}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col h-full py-4">
-          <div className="flex-grow overflow-auto border border-cyan-500/30 rounded-lg">
+        <div className="flex-grow overflow-hidden">
+          <ScrollArea className="h-full">
             <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-slate-800">
+              <TableHeader className="sticky top-0 bg-card">
+                <TableRow>
                   {tableHeader.map((header, index) => (
-                    <TableHead key={index} className="text-cyan-400 whitespace-nowrap">{header}</TableHead>
+                    <TableHead key={index} className="text-muted-foreground whitespace-nowrap">{header}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tableData.length > 0 ? tableData.map((row, rowIndex) => (
-                  <TableRow key={rowIndex} className="hover:bg-slate-800/50">
+                  <TableRow key={rowIndex} className="hover:bg-muted/50">
                     {row.map((cell, cellIndex) => (
-                      <TableCell key={cellIndex} className="text-muted-foreground text-xs whitespace-nowrap">{cell}</TableCell>
+                      <TableCell key={cellIndex} className="text-foreground text-xs whitespace-nowrap">{cell}</TableCell>
                     ))}
                   </TableRow>
                 )) : (
@@ -289,7 +290,7 @@ const BreakdownPopup = ({
                 )}
               </TableBody>
             </Table>
-          </div>
+          </ScrollArea>
         </div>
       </DialogContent>
     </Dialog>
@@ -387,7 +388,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
         const paymentValue = sumColumn(paymentIndex, true);
 
         return {
-            fileCount: fileCountValue > 0 ? fileCountValue.toLocaleString() : "no file entry for this month",
+            fileCount: fileCountValue > 0 ? fileCountValue.toLocaleString() : "0",
             budget: `$${budgetValue.toLocaleString()}`,
             payment: `$${paymentValue.toLocaleString()}`,
             highlights: getColumnText(highlightsIndex),
@@ -397,6 +398,9 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
       }
       
       const overallTotals = calculateTotals(rangedFilteredRows);
+      if (rangedFilteredRows.length === 0) {
+        overallTotals.fileCount = 'no file entry for this month';
+      }
       
       const startMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === startMonth.toLowerCase());
       const endMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === endMonth.toLowerCase());
@@ -524,3 +528,5 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
