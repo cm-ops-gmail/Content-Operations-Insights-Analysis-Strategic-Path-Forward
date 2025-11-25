@@ -438,7 +438,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                         </SelectTrigger>
                         <SelectContent className="border-cyan-500/80">
                             {teams.map((team) => (
-                                <SelectItem key={team} value={team}>
+                                <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background">
                                     {team}
                                 </SelectItem>
                             ))}
@@ -461,7 +461,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                     <Button 
                       onClick={() => setPopupOpen(true)} 
                       variant="outline"
-                      className="w-full bg-background border-foreground text-foreground hover:bg-foreground hover:text-background dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:hover:bg-secondary">
+                      className="w-full bg-transparent border-foreground text-foreground hover:bg-foreground hover:text-background dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:hover:bg-secondary">
                         View Breakdown
                     </Button>
                 </div>
