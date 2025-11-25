@@ -438,7 +438,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                         </SelectTrigger>
                         <SelectContent className="border-cyan-500/80">
                             {teams.map((team) => (
-                                <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background hover:!bg-muted focus:!bg-muted">
+                                <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background hover:!bg-muted focus:!bg-muted dark:hover:!bg-accent dark:focus:!bg-accent">
                                     {team}
                                 </SelectItem>
                             ))}
@@ -523,13 +523,15 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Section title="Section 1" sectionId="section-1" sheetData={sheetData} detailsData={detailsData} />
-                    <Section title="Section 2" sectionId="section-2" sheetData={sheetData} detailsData={detailsData} />
+                    <Section title="Select the team" sectionId="section-1" sheetData={sheetData} detailsData={detailsData} />
+                    <Section title="Select the team" sectionId="section-2" sheetData={sheetData} detailsData={detailsData} />
                 </div>
             </CardContent>
         </Card>
     );
 }
+
+    
 
     
 
