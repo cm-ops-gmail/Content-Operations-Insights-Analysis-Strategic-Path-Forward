@@ -264,7 +264,7 @@ const BreakdownPopup = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[80vh] bg-card border-border flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-blue-900 text-xl dark:text-cyan-400">Sheet Data for {teamName}</DialogTitle>
+          <DialogTitle className="text-xl text-blue-900 dark:text-cyan-400">Sheet Data for {teamName}</DialogTitle>
         </DialogHeader>
         <div className="flex-grow overflow-hidden">
           <ScrollArea className="h-full">
@@ -272,7 +272,7 @@ const BreakdownPopup = ({
               <TableHeader className="sticky top-0 bg-card">
                 <TableRow>
                   {tableHeader.map((header, index) => (
-                    <TableHead key={index} className="text-blue-900 whitespace-nowrap dark:text-purple-400">{header}</TableHead>
+                    <TableHead key={index} className="whitespace-nowrap text-blue-900 dark:text-purple-400">{header}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -438,7 +438,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                         </SelectTrigger>
                         <SelectContent className="border-cyan-500/80">
                             {teams.map((team) => (
-                                <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background">
+                                <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background hover:bg-muted">
                                     {team}
                                 </SelectItem>
                             ))}
@@ -460,8 +460,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                 <div className="mt-2">
                     <Button 
                       onClick={() => setPopupOpen(true)} 
-                      variant="outline"
-                      className="w-full bg-transparent border-foreground text-foreground hover:bg-foreground hover:text-background dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:hover:bg-secondary">
+                      className="w-full bg-background border-foreground text-foreground hover:bg-foreground hover:text-background dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:hover:bg-secondary">
                         View Breakdown
                     </Button>
                 </div>
@@ -537,3 +536,4 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
     
 
     
+
