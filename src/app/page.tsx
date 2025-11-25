@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import DashboardHeader from '@/components/dashboard/header';
 import PerformanceChart from '@/components/dashboard/performance-chart';
 import TeamwiseOverview from '@/components/dashboard/teamwise-overview';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
@@ -149,6 +149,7 @@ export default function Home() {
             <Card className="bg-card/50">
               <CardHeader>
                 <CardTitle className="text-primary">Overview</CardTitle>
+                <CardDescription>A high-level summary of each team&apos;s performance.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
