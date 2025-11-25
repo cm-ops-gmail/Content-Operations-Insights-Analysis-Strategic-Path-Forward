@@ -191,7 +191,7 @@ const AiInsightSection = ({ data, sectionId }: { data: any, sectionId: string })
   };
 
   return (
-    <Card className="bg-slate-900/60 border-purple-500/50">
+    <Card className="bg-slate-900/60 border-purple-500/50 dark:bg-slate-900/60 bg-card">
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
           <Wand2 className="h-5 w-5 text-purple-400" />
@@ -466,9 +466,9 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                 <Separator className="bg-cyan-500/30 my-4" />
 
                 <div className="space-y-4">
-                    <Card className="bg-slate-900/60 border-green-500/50">
+                    <Card className="bg-slate-900/60 border-green-500/50 dark:bg-slate-900/60 bg-card">
                         <CardHeader>
-                            <CardTitle className="text-base font-bold text-green-400">Highlights</CardTitle>
+                            <CardTitle className="text-base font-bold text-green-400 dark:text-green-400 text-green-600">Highlights</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
@@ -478,9 +478,9 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                             </ul>
                         </CardContent>
                     </Card>
-                    <Card className="bg-slate-900/60 border-red-500/50">
+                    <Card className="bg-slate-900/60 border-red-500/50 dark:bg-slate-900/60 bg-card">
                         <CardHeader>
-                            <CardTitle className="text-base font-bold text-red-400">Lowlights</CardTitle>
+                            <CardTitle className="text-base font-bold text-red-400 dark:text-red-400 text-red-600">Lowlights</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
