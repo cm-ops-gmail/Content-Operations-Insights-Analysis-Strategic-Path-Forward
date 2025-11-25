@@ -148,7 +148,7 @@ export default function Home() {
           <div className="grid gap-6">
             <Card className="bg-card/50">
               <CardHeader>
-                <CardTitle>Overview</CardTitle>
+                <CardTitle className="text-primary">Overview</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

@@ -264,7 +264,7 @@ const BreakdownPopup = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[80vh] bg-card border-border flex flex-col">
         <DialogHeader>
-          <DialogTitle className="dark:text-cyan-400 text-foreground text-xl">Sheet Data for {teamName}</DialogTitle>
+          <DialogTitle className="dark:text-cyan-400 text-blue-900 text-xl">Sheet Data for {teamName}</DialogTitle>
         </DialogHeader>
         <div className="flex-grow overflow-hidden">
           <ScrollArea className="h-full">
@@ -272,7 +272,7 @@ const BreakdownPopup = ({
               <TableHeader className="sticky top-0 bg-card">
                 <TableRow>
                   {tableHeader.map((header, index) => (
-                    <TableHead key={index} className="dark:text-purple-400 text-foreground whitespace-nowrap">{header}</TableHead>
+                    <TableHead key={index} className="dark:text-purple-400 text-blue-900 whitespace-nowrap">{header}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -428,7 +428,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
     return (
         <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
             <CardHeader>
-                <CardTitle className="text-lg">{title}</CardTitle>
+                <CardTitle className="text-lg text-cyan-400">{title}</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
                 <div className="w-full">
@@ -513,7 +513,7 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         <Card className="bg-card/50 border-cyan-500/50">
             <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <CardTitle>Teamwise Overview</CardTitle>
+                    <CardTitle className="text-cyan-400">Teamwise Overview</CardTitle>
                     <CardDescription>
                         Select a team in each section to view specific details.
                     </CardDescription>
