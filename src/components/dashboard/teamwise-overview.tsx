@@ -512,7 +512,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
 export default function TeamwiseOverview({ sheetData }: { sheetData: Record<string, any[][]> }) {
     const detailsData = sheetData['Details'] || [];
     return (
-        <Card className="bg-card/50 border-cyan-500/50">
+        <Card className="bg-card/50 border-border">
             <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="space-y-1.5">
                     <CardTitle className="text-cyan-400">Teamwise Overview</CardTitle>
