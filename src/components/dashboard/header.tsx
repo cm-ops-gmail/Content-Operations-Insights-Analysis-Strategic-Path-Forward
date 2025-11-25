@@ -12,9 +12,6 @@ export default function DashboardHeader() {
           <p className="text-sm text-muted-foreground">
             10MS Content Operations Team
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Q3 2024 Analysis | July - September Comparison
-          </p>
         </div>
         <div className="w-28 flex justify-end">
           <Alerts />
