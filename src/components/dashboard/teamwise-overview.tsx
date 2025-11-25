@@ -39,7 +39,6 @@ import { Button } from "@/components/ui/button";
 import { analyzePerformanceAction } from "@/app/actions/analyze";
 import type { AnalyzeQ3PerformanceOutput } from "@/ai/flows/analyze-q3-performance";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 
 
 const teamMap: Record<string, string> = {
@@ -262,7 +261,7 @@ const BreakdownPopup = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl h-[80vh] bg-slate-900/90 border-cyan-500/50 backdrop-blur-sm">
+      <DialogContent className="max-w-4xl h-[80vh] bg-slate-900/90 border-cyan-500/50 backdrop-blur-sm">
         <DialogHeader>
           <DialogTitle className="text-cyan-400 text-xl">Sheet Data for {teamName}</DialogTitle>
         </DialogHeader>
@@ -301,7 +300,7 @@ const BreakdownPopup = ({
 
 const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; sectionId: string; }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
-    const [filters, setFilters] = useState({ startMonth: 'January', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
+    const [filters, setFilters] = useState({ startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
     const [isPopupOpen, setPopupOpen] = useState(false);
 
     const materialVerticalOptions = materialVerticalOptionsList;
@@ -388,7 +387,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
         const paymentValue = sumColumn(paymentIndex, true);
 
         return {
-            fileCount: fileCountValue > 0 ? fileCountValue.toLocaleString() : "0",
+            fileCount: fileCountValue > 0 ? fileCountValue.toLocaleString() : "no file entry for this month",
             budget: `$${budgetValue.toLocaleString()}`,
             payment: `$${paymentValue.toLocaleString()}`,
             highlights: getColumnText(highlightsIndex),
@@ -401,14 +400,22 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
       
       const startMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === startMonth.toLowerCase());
       const endMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === endMonth.toLowerCase());
+      
+      const desiredColumns = ['Month', 'Team [Product]', 'Product / Course', 'Material Vertical', 'File Count', 'Budget', 'payment[paid]'];
+      const desiredColumnIndices = desiredColumns.map(col => headerRow.findIndex(h => h.toLowerCase().trim() === col.toLowerCase().trim()));
+
+      const filteredHeader = desiredColumns;
+      const filteredData = rangedFilteredRows.map(row => {
+          return desiredColumnIndices.map(index => index !== -1 ? row[index] : '');
+      });
 
       return {
           ...overallTotals,
           startMonthTotals: calculateTotals(startMonthRows),
           endMonthTotals: calculateTotals(endMonthRows),
           breakdownData: [],
-          rawSheetHeader: headerRow,
-          rawSheetData: rangedFilteredRows
+          rawSheetHeader: filteredHeader,
+          rawSheetData: filteredData
       };
 
   }, [currentTeamData, filters]);
