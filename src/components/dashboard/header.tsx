@@ -1,4 +1,4 @@
-import Alerts from './alerts';
+import ThemeToggle from './theme-toggle';
 
 export default function DashboardHeader() {
   return (
@@ -14,7 +14,7 @@ export default function DashboardHeader() {
           </p>
         </div>
         <div className="w-28 flex justify-end">
-          <Alerts />
+          <ThemeToggle />
         </div>
       </div>
     </header>
