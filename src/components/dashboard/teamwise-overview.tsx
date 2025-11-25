@@ -426,14 +426,14 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
 
 
     return (
-        <Card className="border-cyan-500/50 bg-background/50 flex flex-col">
+        <Card className="border-border bg-background/50 flex flex-col">
             <CardHeader>
                 <CardTitle className="text-lg text-cyan-400">{title}</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
                 <div className="w-full">
                     <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                        <SelectTrigger className="w-full border-cyan-500/80 focus:ring-cyan-500">
+                        <SelectTrigger className="w-full focus:ring-cyan-500 border-0">
                             <SelectValue placeholder="Select a team" />
                         </SelectTrigger>
                         <SelectContent className="border-cyan-500/80">
@@ -460,7 +460,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                 <div className="mt-2">
                     <Button 
                       onClick={() => setPopupOpen(true)} 
-                      className="w-full bg-muted border-transparent text-foreground hover:bg-foreground hover:text-background dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:hover:bg-secondary">
+                      className="w-full bg-muted border-border text-foreground hover:bg-foreground hover:text-background dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:hover:bg-secondary">
                         View Breakdown
                     </Button>
                 </div>
