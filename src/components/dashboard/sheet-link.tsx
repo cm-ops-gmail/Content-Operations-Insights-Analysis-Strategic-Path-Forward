@@ -39,7 +39,7 @@ export default function SheetLink() {
       variant="outline"
       size="sm"
       onClick={() => window.open(sheetUrl, '_blank')}
-      className="hover:bg-secondary"
+      className="hover:bg-foreground hover:text-background dark:hover:bg-secondary"
     >
       <SheetIcon className="mr-2 h-4 w-4" />
       Sheet
