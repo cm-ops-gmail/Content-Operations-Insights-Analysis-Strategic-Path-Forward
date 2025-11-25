@@ -262,17 +262,17 @@ const BreakdownPopup = ({
 
   const monthColorMap: Record<string, string> = {
     January: "text-red-400",
-    February: "text-green-400",
-    March: "text-yellow-400",
+    February: "text-blue-500",
+    March: "text-purple-400",
     April: "text-blue-400",
     May: "text-indigo-400",
-    June: "text-purple-400",
-    July: "text-pink-400",
+    June: "text-purple-500",
+    July: "text-cyan-400",
     August: "text-sky-400",
-    September: "text-emerald-400",
-    October: "text-amber-400",
+    September: "text-blue-300",
+    October: "text-indigo-300",
     November: "text-violet-400",
-    December: "text-rose-400",
+    December: "text-red-500",
   };
   
   const monthColumnIndex = tableHeader.findIndex(h => h.toLowerCase().trim() === 'month');
@@ -551,6 +551,8 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
 
     
 
