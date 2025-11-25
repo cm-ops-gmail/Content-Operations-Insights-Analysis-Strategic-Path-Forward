@@ -260,6 +260,23 @@ const BreakdownPopup = ({
 }) => {
   if (!isOpen) return null;
 
+  const monthColorMap: Record<string, string> = {
+    January: "text-red-400",
+    February: "text-green-400",
+    March: "text-yellow-400",
+    April: "text-blue-400",
+    May: "text-indigo-400",
+    June: "text-purple-400",
+    July: "text-pink-400",
+    August: "text-sky-400",
+    September: "text-emerald-400",
+    October: "text-amber-400",
+    November: "text-violet-400",
+    December: "text-rose-400",
+  };
+  
+  const monthColumnIndex = tableHeader.findIndex(h => h.toLowerCase().trim() === 'month');
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[80vh] bg-card border-border flex flex-col">
@@ -279,9 +296,13 @@ const BreakdownPopup = ({
               <TableBody>
                 {tableData.length > 0 ? tableData.map((row, rowIndex) => (
                   <TableRow key={rowIndex} className="hover:bg-muted/50">
-                    {row.map((cell, cellIndex) => (
-                      <TableCell key={cellIndex} className="text-foreground text-xs whitespace-nowrap">{cell}</TableCell>
-                    ))}
+                    {row.map((cell, cellIndex) => {
+                      const isMonthColumn = cellIndex === monthColumnIndex;
+                      const monthColor = isMonthColumn ? monthColorMap[cell as string] || 'text-foreground' : 'text-foreground';
+                      return (
+                        <TableCell key={cellIndex} className={`${monthColor} text-xs whitespace-nowrap`}>{cell}</TableCell>
+                      );
+                    })}
                   </TableRow>
                 )) : (
                   <TableRow>
