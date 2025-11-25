@@ -264,7 +264,7 @@ const BreakdownPopup = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[80vh] bg-card border-border flex flex-col">
         <DialogHeader>
-          <DialogTitle className="dark:text-cyan-400 text-blue-900 text-xl">Sheet Data for {teamName}</DialogTitle>
+          <DialogTitle className="text-blue-900 text-xl dark:text-cyan-400">Sheet Data for {teamName}</DialogTitle>
         </DialogHeader>
         <div className="flex-grow overflow-hidden">
           <ScrollArea className="h-full">
@@ -272,7 +272,7 @@ const BreakdownPopup = ({
               <TableHeader className="sticky top-0 bg-card">
                 <TableRow>
                   {tableHeader.map((header, index) => (
-                    <TableHead key={index} className="dark:text-purple-400 text-blue-900 whitespace-nowrap">{header}</TableHead>
+                    <TableHead key={index} className="text-blue-900 whitespace-nowrap dark:text-purple-400">{header}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -458,7 +458,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                 </div>
                 
                 <div className="mt-2">
-                    <Button onClick={() => setPopupOpen(true)} className="w-full" variant="outline">
+                    <Button onClick={() => setPopupOpen(true)} className="w-full">
                         View Breakdown
                     </Button>
                 </div>
@@ -528,5 +528,7 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
 
     
