@@ -264,7 +264,7 @@ const BreakdownPopup = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[80vh] bg-card border-border flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-foreground text-xl">Sheet Data for {teamName}</DialogTitle>
+          <DialogTitle className="text-cyan-400 text-xl">Sheet Data for {teamName}</DialogTitle>
         </DialogHeader>
         <div className="flex-grow overflow-hidden">
           <ScrollArea className="h-full">
@@ -272,7 +272,7 @@ const BreakdownPopup = ({
               <TableHeader className="sticky top-0 bg-card">
                 <TableRow>
                   {tableHeader.map((header, index) => (
-                    <TableHead key={index} className="text-muted-foreground whitespace-nowrap">{header}</TableHead>
+                    <TableHead key={index} className="text-purple-400 whitespace-nowrap">{header}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
