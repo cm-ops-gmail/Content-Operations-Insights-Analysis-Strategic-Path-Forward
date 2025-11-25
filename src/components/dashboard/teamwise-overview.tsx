@@ -261,18 +261,18 @@ const BreakdownPopup = ({
   if (!isOpen) return null;
 
   const monthColorMap: Record<string, string> = {
-    January: "text-red-500",
-    February: "text-blue-500",
-    March: "text-purple-400",
-    April: "text-blue-400",
-    May: "text-indigo-400",
-    June: "text-purple-500",
-    July: "text-cyan-400",
-    August: "text-sky-400",
-    September: "text-blue-300",
-    October: "text-indigo-300",
-    November: "text-violet-400",
-    December: "text-red-500",
+    January: "text-blue-400",
+    February: "text-red-400",
+    March: "text-blue-400",
+    April: "text-red-400",
+    May: "text-blue-400",
+    June: "text-red-400",
+    July: "text-blue-400",
+    August: "text-red-400",
+    September: "text-blue-400",
+    October: "text-red-400",
+    November: "text-blue-400",
+    December: "text-red-400",
   };
   
   const monthColumnIndex = tableHeader.findIndex(h => h.toLowerCase().trim() === 'month');
