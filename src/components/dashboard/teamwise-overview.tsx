@@ -311,7 +311,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
 
     const { fileCount, budget, payment, highlights, lowlights, insights, startMonthTotals, endMonthTotals, breakdownData, rawSheetHeader, rawSheetData } = useMemo(() => {
       if (currentTeamData.length < 2) {
-          return { fileCount: '0', budget: '$0', payment: '$0', highlights: [], lowlights: [], insights: '', startMonthTotals: {}, endMonthTotals: {}, breakdownData: [], rawSheetHeader: [], rawSheetData: [] };
+          return { fileCount: '0', budget: '0', payment: '0', highlights: [], lowlights: [], insights: '', startMonthTotals: {}, endMonthTotals: {}, breakdownData: [], rawSheetHeader: [], rawSheetData: [] };
       }
   
       const headerRow = currentTeamData[0].map(h => String(h).trim());
@@ -359,8 +359,8 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
         if (rows.length === 0) {
             return {
                 fileCount: 'no file entry for this month',
-                budget: '$0',
-                payment: '$0',
+                budget: '0',
+                payment: '0',
                 highlights: [],
                 lowlights: [],
                 insights: ''
@@ -389,8 +389,8 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
 
         return {
             fileCount: fileCountValue > 0 ? fileCountValue.toLocaleString() : "0",
-            budget: `$${budgetValue.toLocaleString()}`,
-            payment: `$${paymentValue.toLocaleString()}`,
+            budget: `${budgetValue.toLocaleString()}`,
+            payment: `${paymentValue.toLocaleString()}`,
             highlights: getColumnText(highlightsIndex),
             lowlights: getColumnText(lowlightsIndex),
             insights: getColumnText(insightsIndex).join(' '),
@@ -530,6 +530,8 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
 
     
 
