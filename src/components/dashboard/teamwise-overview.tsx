@@ -261,7 +261,7 @@ const BreakdownPopup = ({
   if (!isOpen) return null;
 
   const monthColorMap: Record<string, string> = {
-    January: "text-red-400",
+    January: "text-red-500",
     February: "text-blue-500",
     March: "text-purple-400",
     April: "text-blue-400",
