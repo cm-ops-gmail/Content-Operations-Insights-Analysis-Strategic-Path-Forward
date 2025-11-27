@@ -40,6 +40,7 @@ import { analyzePerformanceAction } from "@/app/actions/analyze";
 import type { AnalyzeQ3PerformanceOutput } from "@/ai/flows/analyze-q3-performance";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
 
 
 const teamMap: Record<string, string> = {
@@ -124,11 +125,28 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
     </div>
     <div className="space-y-2">
       <Label htmlFor="team-product" className="text-xs text-muted-foreground">Team [Product]</Label>
-      <Select value={filters.teamAndProduct} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, teamAndProduct: value }))}>
+      <Select 
+        value={filters.teamAndProduct} 
+        onValueChange={(value) => {
+            setFilters((prev: any) => ({ ...prev, teamAndProduct: value, clearTeamAndProduct: false }));
+        }}>
         <SelectTrigger id="team-product" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-          <SelectValue placeholder="Team [Product]" />
+          <SelectValue placeholder="Teams" />
         </SelectTrigger>
         <SelectContent className="border-cyan-500/80">
+            <div className="flex items-center gap-2 p-2" onClick={(e) => e.stopPropagation()}>
+              <Checkbox 
+                id="clear-team-product"
+                checked={!filters.teamAndProduct}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setFilters((prev: any) => ({ ...prev, teamAndProduct: '' }))
+                  }
+                }}
+              />
+              <Label htmlFor="clear-team-product" className="text-xs font-normal">Clear</Label>
+            </div>
+            <Separator />
           {teamAndProductOptions.map((category: string) => (
             <SelectItem key={category} value={category}>
               {category}
@@ -139,11 +157,28 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
     </div>
     <div className="space-y-2">
       <Label htmlFor="material-vertical" className="text-xs text-muted-foreground">Material Vertical</Label>
-      <Select value={filters.materialVertical} onValueChange={(value) => setFilters((prev: any) => ({ ...prev, materialVertical: value }))}>
+      <Select 
+        value={filters.materialVertical} 
+        onValueChange={(value) => {
+             setFilters((prev: any) => ({ ...prev, materialVertical: value, clearMaterialVertical: false }));
+        }}>
         <SelectTrigger id="material-vertical" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
-          <SelectValue placeholder="Material Vertical" />
+          <SelectValue placeholder="Verticals" />
         </SelectTrigger>
         <SelectContent className="border-cyan-500/80 max-h-60">
+            <div className="flex items-center gap-2 p-2" onClick={(e) => e.stopPropagation()}>
+              <Checkbox 
+                id="clear-material-vertical"
+                checked={!filters.materialVertical}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setFilters((prev: any) => ({ ...prev, materialVertical: '' }))
+                  }
+                }}
+              />
+              <Label htmlFor="clear-material-vertical" className="text-xs font-normal">Clear</Label>
+            </div>
+            <Separator />
           {materialVerticalOptions.map((option: string) => (
             <SelectItem key={option} value={option}>
               {option}
@@ -551,6 +586,10 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
+
+    
 
     
 
