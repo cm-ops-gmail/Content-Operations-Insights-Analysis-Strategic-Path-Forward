@@ -470,7 +470,7 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
       const startMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === startMonth.toLowerCase());
       const endMonthRows = preFilteredRows.filter(row => String(row[monthIndex]).trim().toLowerCase() === endMonth.toLowerCase());
       
-      const desiredColumns = ['Month', 'Team [Product]', 'Product / Course', 'Material Vertical', 'File Count', 'Budget', 'payment[paid]'];
+      const desiredColumns = ['Month', 'Team [Product]', 'Product / Course', 'Material Vertical', 'File Count', 'Budget', 'payment [paid]'];
       const desiredColumnIndices = desiredColumns.map(col => headerRow.findIndex(h => h.toLowerCase().trim() === col.toLowerCase().trim()));
 
       const filteredHeader = desiredColumns;
@@ -602,35 +602,3 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
