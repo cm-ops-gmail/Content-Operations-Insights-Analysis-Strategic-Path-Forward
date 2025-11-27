@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Wand2, AlertCircle, TrendingUp, TrendingDown } from "lucide-react"
+import { Wand2, AlertCircle, RefreshCcw } from "lucide-react"
 
 import {
   Card,
@@ -128,25 +128,25 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
       <Select 
         value={filters.teamAndProduct} 
         onValueChange={(value) => {
-            setFilters((prev: any) => ({ ...prev, teamAndProduct: value, clearTeamAndProduct: false }));
+            setFilters((prev: any) => ({ ...prev, teamAndProduct: value }));
         }}>
         <SelectTrigger id="team-product" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
           <SelectValue placeholder="Teams" />
         </SelectTrigger>
         <SelectContent className="border-cyan-500/80">
-            <div className="flex items-center gap-2 p-2" onClick={(e) => e.stopPropagation()}>
-              <Checkbox 
-                id="clear-team-product"
+          <div className="flex items-center space-x-2 p-2">
+            <Checkbox
+                id="all-teams"
                 checked={!filters.teamAndProduct}
                 onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFilters((prev: any) => ({ ...prev, teamAndProduct: '' }))
-                  }
+                    if (checked) {
+                        setFilters((prev: any) => ({ ...prev, teamAndProduct: "" }));
+                    }
                 }}
-              />
-              <Label htmlFor="clear-team-product" className="text-xs font-normal">Clear</Label>
-            </div>
-            <Separator />
+            />
+            <Label htmlFor="all-teams" className="text-xs font-normal">All</Label>
+          </div>
+          <Separator />
           {teamAndProductOptions.map((category: string) => (
             <SelectItem key={category} value={category}>
               {category}
@@ -160,23 +160,23 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
       <Select 
         value={filters.materialVertical} 
         onValueChange={(value) => {
-             setFilters((prev: any) => ({ ...prev, materialVertical: value, clearMaterialVertical: false }));
+             setFilters((prev: any) => ({ ...prev, materialVertical: value }));
         }}>
         <SelectTrigger id="material-vertical" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
           <SelectValue placeholder="Verticals" />
         </SelectTrigger>
         <SelectContent className="border-cyan-500/80 max-h-60">
-            <div className="flex items-center gap-2 p-2" onClick={(e) => e.stopPropagation()}>
-              <Checkbox 
-                id="clear-material-vertical"
-                checked={!filters.materialVertical}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFilters((prev: any) => ({ ...prev, materialVertical: '' }))
-                  }
-                }}
-              />
-              <Label htmlFor="clear-material-vertical" className="text-xs font-normal">Clear</Label>
+            <div className="flex items-center space-x-2 p-2">
+                <Checkbox
+                    id="all-verticals"
+                    checked={!filters.materialVertical}
+                    onCheckedChange={(checked) => {
+                        if (checked) {
+                            setFilters((prev: any) => ({ ...prev, materialVertical: "" }));
+                        }
+                    }}
+                />
+                <Label htmlFor="all-verticals" className="text-xs font-normal">All</Label>
             </div>
             <Separator />
           {materialVerticalOptions.map((option: string) => (
@@ -353,17 +353,21 @@ const BreakdownPopup = ({
   );
 };
 
-
+const initialFilters = { startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' };
 
 const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; sheetData: Record<string, any[][]>; detailsData: any[][]; sectionId: string; }) => {
     const [selectedTeam, setSelectedTeam] = useState(teams[0]);
-    const [filters, setFilters] = useState({ startMonth: 'July', endMonth: 'September', teamAndProduct: '', materialVertical: '' });
+    const [filters, setFilters] = useState(initialFilters);
     const [isPopupOpen, setPopupOpen] = useState(false);
 
     const materialVerticalOptions = materialVerticalOptionsList;
 
     const currentTeamSheetName = teamMap[selectedTeam];
     const currentTeamData = sheetData[currentTeamSheetName] || [];
+    
+    const handleReset = () => {
+      setFilters(initialFilters);
+    };
 
     const { fileCount, budget, payment, highlights, lowlights, insights, startMonthTotals, endMonthTotals, breakdownData, rawSheetHeader, rawSheetData } = useMemo(() => {
       if (currentTeamData.length < 2) {
@@ -483,24 +487,29 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
 
     return (
         <Card className="border-border bg-background/50 flex flex-col">
-            <CardHeader>
-                <CardTitle className="text-lg text-cyan-400">{title}</CardTitle>
+            <CardHeader className="flex flex-row justify-between items-start">
+                <div className="space-y-1">
+                  <CardTitle className="text-lg text-cyan-400">{title}</CardTitle>
+                  <Select value={selectedTeam} onValueChange={setSelectedTeam}>
+                      <SelectTrigger className="w-auto focus:ring-cyan-500 border-cyan-500/80 text-xs h-8">
+                          <SelectValue placeholder="Select a team" />
+                      </SelectTrigger>
+                      <SelectContent className="border-cyan-500/80">
+                          {teams.map((team) => (
+                              <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background hover:!bg-muted focus:!bg-muted dark:hover:!bg-accent dark:focus:!bg-accent">
+                                  {team}
+                              </SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleReset} className="text-cyan-400 border-cyan-400/50 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400">
+                    <RefreshCcw className="mr-2 h-4 w-4" />
+                    Clear
+                </Button>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
-                <div className="w-full">
-                    <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                        <SelectTrigger className="w-full focus:ring-cyan-500 border-cyan-500/80">
-                            <SelectValue placeholder="Select a team" />
-                        </SelectTrigger>
-                        <SelectContent className="border-cyan-500/80">
-                            {teams.map((team) => (
-                                <SelectItem key={team} value={team} className="dark:data-[state=checked]:bg-primary dark:data-[state=checked]:text-primary-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background hover:!bg-muted focus:!bg-muted dark:hover:!bg-accent dark:focus:!bg-accent">
-                                    {team}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                
                 <FilterDropdowns 
                   materialVerticalOptions={materialVerticalOptions}
                   filters={filters}
@@ -586,6 +595,10 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
+
+    
 
     
 
