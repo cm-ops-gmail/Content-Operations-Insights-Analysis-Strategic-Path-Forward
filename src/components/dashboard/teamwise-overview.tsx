@@ -88,12 +88,17 @@ const materialVerticalOptionsList = [
     "Practice Sheet"
 ];
 
-const Scoreboard = ({ title, value }: { title: string; value: string }) => (
-  <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30 hover:border-cyan-400/80 transition-colors">
-    <p className="text-sm text-muted-foreground">{title}</p>
-    <p className="text-2xl font-bold text-foreground">{value}</p>
-  </div>
-);
+const Scoreboard = ({ title, value }: { title: string; value: string }) => {
+    const isNoEntry = value === 'no file entry for this month';
+    return (
+        <div className="flex flex-col items-center justify-center p-4 rounded-lg bg-background/20 border border-cyan-500/30 hover:border-cyan-400/80 transition-colors">
+            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className={`font-bold text-foreground ${isNoEntry ? 'text-base' : 'text-2xl'}`}>
+                {value}
+            </p>
+        </div>
+    );
+};
 
 const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -128,7 +133,7 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
       <Select 
         value={filters.teamAndProduct} 
         onValueChange={(value) => {
-            setFilters((prev: any) => ({ ...prev, teamAndProduct: value }));
+            setFilters((prev: any) => ({ ...prev, teamAndProduct: value === 'all' ? '' : value }));
         }}>
         <SelectTrigger id="team-product" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
           <SelectValue placeholder="Teams" />
@@ -160,7 +165,7 @@ const FilterDropdowns = ({ materialVerticalOptions, filters, setFilters }: any) 
       <Select 
         value={filters.materialVertical} 
         onValueChange={(value) => {
-             setFilters((prev: any) => ({ ...prev, materialVertical: value }));
+             setFilters((prev: any) => ({ ...prev, materialVertical: value === 'all' ? '' : value }));
         }}>
         <SelectTrigger id="material-vertical" className="w-full border-cyan-500/80 focus:ring-cyan-500 text-xs">
           <SelectValue placeholder="Verticals" />
@@ -314,7 +319,7 @@ const BreakdownPopup = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[80vh] bg-card border-border flex flex-col">
+      <DialogContent className="max-w-6xl h-[80vh] bg-card border-border flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl text-blue-900 dark:text-cyan-400">Sheet Data for {teamName}</DialogTitle>
         </DialogHeader>
@@ -487,11 +492,13 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
 
     return (
         <Card className="border-border bg-background/50 flex flex-col">
-            <CardHeader className="flex flex-row justify-between items-start">
-                <div className="space-y-1">
-                  <CardTitle className="text-lg text-cyan-400">{title}</CardTitle>
+            <CardHeader>
+                <div className="flex justify-between items-center mb-4">
+                    <CardTitle className="text-lg text-cyan-400">{title}</CardTitle>
+                </div>
+                <div className="flex items-center gap-4">
                   <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                      <SelectTrigger className="w-auto focus:ring-cyan-500 border-cyan-500/80 text-xs h-8">
+                      <SelectTrigger className="w-auto focus:ring-cyan-500 border-cyan-500/80 text-xs h-9">
                           <SelectValue placeholder="Select a team" />
                       </SelectTrigger>
                       <SelectContent className="border-cyan-500/80">
@@ -502,11 +509,11 @@ const Section = ({ title, sheetData, detailsData, sectionId }: { title: string; 
                           ))}
                       </SelectContent>
                   </Select>
+                  <Button variant="outline" size="sm" onClick={handleReset} className="text-cyan-400 border-cyan-400/50 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400 h-9 ml-auto">
+                      <RefreshCcw className="mr-2 h-4 w-4" />
+                      Clear
+                  </Button>
                 </div>
-                <Button variant="outline" size="sm" onClick={handleReset} className="text-cyan-400 border-cyan-400/50 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400">
-                    <RefreshCcw className="mr-2 h-4 w-4" />
-                    Clear
-                </Button>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4">
                 
@@ -595,6 +602,10 @@ export default function TeamwiseOverview({ sheetData }: { sheetData: Record<stri
         </Card>
     );
 }
+
+    
+
+    
 
     
 
